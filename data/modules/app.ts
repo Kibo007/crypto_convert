@@ -1,18 +1,48 @@
 import 'isomorphic-fetch';
-import { bindActionCreators } from 'redux';
+import { bindActionCreators, Dispatch, Reducer } from 'redux';
+import { MainState } from './../store';
 
 // ---------------------------------------------------------------------------------------------
 // ----------------------------     Action type     --------------------------------------------
 // ---------------------------------------------------------------------------------------------
 
-export const ADD_LOAD = 'app';
+enum ActionTypes {
+  ALL_ASSETS_FETCHED = 'ALL_ASSETS_FETCHED',
+  ERROR_LOADING_ASSETS = 'ERROR_LOADING_ASSETS',
+  LOADING = 'LOADING',
+}
 
 // ---------------------------------------------------------------------------------------------
 // ---------------------------- Action creator  ------------------------------------------------
 // ---------------------------------------------------------------------------------------------
+interface IAssetsUpdate {
+  readonly type: ActionTypes.ALL_ASSETS_FETCHED;
+  readonly payload: object,
+}
 
-const updateHeader = () => ({
-  type: ADD_LOAD,
+const assetsFetched = (assets: object): IAssetsUpdate => ({
+  type: ActionTypes.ALL_ASSETS_FETCHED,
+  payload: assets,
+});
+
+interface ILoadingUpdate {
+  readonly type: ActionTypes.LOADING;
+  readonly payload: boolean,
+}
+
+const loading = (isLoading: boolean): ILoadingUpdate => ({
+  type: ActionTypes.LOADING,
+  payload: isLoading,
+});
+
+interface ILoadingAssetsError {
+  readonly type: ActionTypes.ERROR_LOADING_ASSETS;
+  readonly payload: object,
+}
+
+const handleError = (error: object): ILoadingAssetsError => ({
+  type: ActionTypes.ERROR_LOADING_ASSETS,
+  payload: error,
 });
 
 // ---------------------------------------------------------------------------------------------
@@ -20,59 +50,69 @@ const updateHeader = () => ({
 // ---------------------------------------------------------------------------------------------
 
 
-const fetchBooks = (query, startIndex = 0) => {
-
-  return dispatch => {
+const fetchAssets = (): object => {
+  return (dispatch: Dispatch<IState>) => {
     dispatch(loading(true));
     return fetch(`https://min-api.cryptocompare.com/data/all/coinlist`)
-      .then(checkStatus)
-      .then(parseJSON)
-      .then(json => dispatch(booksFetched(json, query)))
+      .then(json => dispatch(assetsFetched(json)))
       .catch(error => dispatch(handleError(error)));
   };
 };
 
-// --------------------------
-// Reducers
-// --------------------------
+// ---------------------------------------------------------------------------------------------
+// ----------------------------         Reducer       ------------------------------------------
+// ---------------------------------------------------------------------------------------------
 
 const initialState = {
-  load: '',
+  assets: {},
+  loading: false,
+  error: {},
 };
 
-interface InitialState {
-  load: string
+export interface IState {
+  assets: object,
+  loading: boolean,
+  error: object,
 }
 
-interface IAction {
-  type: string
-  payload: string,
-}
+type Action = IAssetsUpdate | ILoadingUpdate | ILoadingAssetsError;
 
-type Action = IAction;
-
-export default (state: InitialState = initialState, action: Action) => {
+export const app: Reducer<IState> = (state: IState = initialState, action: Action): IState => {
   switch (action.type) {
-    case ADD_LOAD:
+    case ActionTypes.ALL_ASSETS_FETCHED:
       return {
         ...state,
-        load: action.payload,
+        assets: action.payload,
+      };
+    case ActionTypes.ERROR_LOADING_ASSETS:
+      return {
+        ...state,
+        error: action.payload,
+      };
+    case ActionTypes.LOADING:
+      return {
+        ...state,
+        loading: action.payload,
       };
     default:
       return state;
   }
 };
 
+// ---------------------------------------------------------------------------------------------
+// ----------------------------        Selectors      ------------------------------------------
+// ---------------------------------------------------------------------------------------------
 
-// --------------------------
-// Selectors
-// --------------------------
-
-export const mapStateToProps = (state: any) => {
-
+export const mapStateToProps = (state: MainState): object => {
   return {
-    load: state.app.load,
+    assets: state.app.assets,
   };
 };
 
-export const mapStateToDispatch = {};
+// ---------------------------------------------------------------------------------------------
+// ---------------------------- Action bind creators  ------------------------------------------
+// ---------------------------------------------------------------------------------------------
+
+export const mapActionToDispatch = (dispatch: Dispatch<IState>) => {
+  return bindActionCreators({ fetchAssets }, dispatch);
+};

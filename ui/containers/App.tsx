@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { mapStateToProps, mapStateToDispatch } from '../../data/modules/app';
+import { mapStateToProps, mapActionToDispatch } from '../../data/modules/app';
 import './app.scss';
 import './../styles/layout.scss';
 
@@ -9,19 +9,23 @@ import NavigationBar from './../components/navigationBar/NavigationBar';
 
 import Divider from 'material-ui/Divider';
 import { List } from 'material-ui/List';
-
 import TextField from 'material-ui/TextField';
 
-interface Props {
-  load: string;
+interface IProps {
+  assets: object;
+  fetchAssets(): Function;
 }
 
-class App extends React.Component<Props, {}> {
+class App extends React.Component<IProps, {}> {
 
-  render() {
+  componentWillMount() {
+    this.props.fetchAssets();
+  }
+
+  public render() {
     return (
       <div>
-        <NavigationBar />
+        <NavigationBar title="Crypto convert"/>
         <List>
           <div data-layout="column" data-layout-align="center center" >
             <TextField
@@ -45,4 +49,4 @@ class App extends React.Component<Props, {}> {
   }
 }
 
-export default connect(mapStateToProps, mapStateToDispatch)(App);
+export default connect(mapStateToProps, mapActionToDispatch)(App);

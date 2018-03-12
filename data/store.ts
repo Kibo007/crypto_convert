@@ -3,11 +3,16 @@ import {routerMiddleware, routerReducer} from 'react-router-redux';
 import thunk from 'redux-thunk';
 import createHistory from 'history/createBrowserHistory';
 
-import app from './modules/app';
+import { IState as AppState, app } from './modules/app';
 
-const rootReducer = combineReducers({
-  router: routerReducer,
+export interface MainState {
+  app: AppState;
+  router: any;
+}
+
+const rootReducer = combineReducers<MainState>({
   app,
+  router: routerReducer,
 });
 
 export const history = createHistory();
