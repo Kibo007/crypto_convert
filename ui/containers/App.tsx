@@ -1,8 +1,16 @@
-import * as React from 'react'
+import * as React from 'react';
 import { connect } from 'react-redux';
 import { mapStateToProps, mapStateToDispatch } from '../../data/modules/app';
+import './app.scss';
+import './../styles/layout.scss';
 
-import Hello from './../components/hello/Hello';
+import AssetSelect from './../components/assetSelect/AssetSelect';
+import NavigationBar from './../components/navigationBar/NavigationBar';
+
+import Divider from 'material-ui/Divider';
+import { List } from 'material-ui/List';
+
+import TextField from 'material-ui/TextField';
 
 interface Props {
   load: string;
@@ -13,8 +21,25 @@ class App extends React.Component<Props, {}> {
   render() {
     return (
       <div>
-        this is page
-        <Hello compiler="typescript" framework="react"/>
+        <NavigationBar />
+        <List>
+          <div data-layout="column" data-layout-align="center center" >
+            <TextField
+              floatingLabelText="Amount of assets to convert"
+              hintText="0"
+              floatingLabelFixed={false}
+              type="number"
+            />
+            <AssetSelect />
+          </div>
+
+          <Divider />
+
+          <div data-layout="column" data-layout-align="center center" >
+            <AssetSelect />
+          </div>
+
+        </List>
       </div>
     );
   }

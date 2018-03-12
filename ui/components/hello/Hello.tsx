@@ -2,6 +2,7 @@ import * as React from 'react';
 const styles = require('./hello.scss');
 // import styles from './hello.scss';
 
+import RaisedButton from 'material-ui/RaisedButton';
 
 export interface HelloProps {
   compiler: string;
@@ -18,9 +19,12 @@ function identity<T>(arg: T): T {
 }
 
 const Hello = (props: HelloProps) => (
-  <h1 className={styles.coolClass}>
-    Hello from {props.compiler} and {props.framework} {identity<string>('test')}!
-  </h1>
+  <div>
+    <h1 className={styles.coolClass}>
+      Hello from {props.compiler} and {props.framework} {identity<string>('test')}!
+    </h1>
+    <RaisedButton label="Default" />
+  </div>
 );
 
 export default Hello;

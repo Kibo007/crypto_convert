@@ -1,0 +1,102 @@
+/* Layout
+ ------------------------------ ------------------------------ ------------------------------ ------------------------------
+ ------------------------------ ------------------------------ ------------------------------ ------------------------------
+ ------------------------------ ------------------------------ ------------------------------ ------------------------------
+*/
+
+[data-layout] {
+  box-sizing: border-box;
+  display: flex!important;
+}
+
+[data-layout=column] {
+  flex-direction: column;
+}
+
+[data-layout=row] {
+  flex-direction: row;
+}
+
+[data-layout=row-reverse] {
+  flex-direction: row-reverse;
+}
+
+[data-flex] {
+  box-sizing: border-box;
+  flex: 1!important;
+}
+
+[data-flex-2] {
+  box-sizing: border-box;
+  flex: 2!important;
+}
+
+[data-flex-4] {
+  box-sizing: border-box;
+  flex: 4!important;
+}
+
+/* Alignment attributes for layout containers' children
+// Arrange on the Main Axis
+// center, start, end, space-between, space-around
+// flex-start is the default for justify-content
+------------------------------
+*/
+
+/* Main Axis Center */
+[data-layout-align="center"],
+
+  /* stretch */
+[data-layout-align^="center "] {
+  justify-content: center;
+}
+
+/* Main Axis End */
+[data-layout-align="end"],
+
+  /* stretch */
+[data-layout-align^="end "] {
+  justify-content: flex-end;
+}
+
+/* Main Axis Space Around */
+[data-layout-align="space-around"],
+
+  /* stretch */
+[data-layout-align^="space-around "] {
+  justify-content: space-around;
+}
+
+/* Main Axis Space Between */
+[data-layout-align="space-between"],
+
+  /* stretch */
+[data-layout-align^="space-between "] {
+  justify-content: space-between;
+}
+
+
+/* Arrange on the Cross Axis
+// center, start, end
+// stretch is the default for align-items
+// ------------------------------
+*/
+
+/* Cross Axis Center */
+[data-layout-align$=" center"] {
+  align-items: center;
+}
+
+/* Cross Axis Start */
+[data-layout-align$=" start"] {
+  align-items: flex-start;
+}
+
+/* Cross Axis End */
+[data-layout-align$=" end"] {
+  align-items: flex-end;
+}
+
+[data-layout-wrap]{
+  flex-wrap: wrap;
+}
