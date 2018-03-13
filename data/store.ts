@@ -1,8 +1,8 @@
 import { createStore, applyMiddleware, compose, combineReducers } from 'redux';
 import { routerMiddleware, routerReducer } from 'react-router-redux';
-import * as thunk from 'redux-thunk';
+import reduxThunk from 'redux-thunk';
 import createBrowserHistory from 'history/createBrowserHistory';
-import * as promise from 'redux-promise';
+import reduxPromise from 'redux-promise';
 
 import { IState as AppState, app } from './modules/app';
 
@@ -21,9 +21,9 @@ export const history = createBrowserHistory();
 const initialState = {};
 const enhancers = [];
 const middleware = [
-  thunk.default,
+  reduxThunk,
   routerMiddleware(history),
-  promise,
+  reduxPromise,
 ];
 
 if (process.env.NODE_ENV === 'development') {

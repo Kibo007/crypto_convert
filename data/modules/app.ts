@@ -17,7 +17,7 @@ enum ActionTypes {
 // ---------------------------------------------------------------------------------------------
 interface IAssetsUpdate {
   readonly type: ActionTypes.ALL_ASSETS_FETCHED;
-  readonly payload: object,
+  readonly payload: object;
 }
 
 const assetsFetched = (assets: object): IAssetsUpdate => ({
@@ -27,7 +27,7 @@ const assetsFetched = (assets: object): IAssetsUpdate => ({
 
 interface ILoadingUpdate {
   readonly type: ActionTypes.LOADING;
-  readonly payload: boolean,
+  readonly payload: boolean;
 }
 
 const loading = (isLoading: boolean): ILoadingUpdate => ({
@@ -37,7 +37,7 @@ const loading = (isLoading: boolean): ILoadingUpdate => ({
 
 interface ILoadingAssetsError {
   readonly type: ActionTypes.ERROR_LOADING_ASSETS;
-  readonly payload: object,
+  readonly payload: object;
 }
 
 const handleError = (error: object): ILoadingAssetsError => ({
@@ -50,7 +50,7 @@ const handleError = (error: object): ILoadingAssetsError => ({
 // ---------------------------------------------------------------------------------------------
 
 
-const fetchAssets = (): object => {
+const fetchAssets = () => {
   return (dispatch: Dispatch<IState>) => {
     dispatch(loading(true));
     return fetch(`https://min-api.cryptocompare.com/data/all/coinlist`)
@@ -126,7 +126,6 @@ const getAssetsCode = (assets: IAssets) => {
 const getAssets = (assets: IAssets) => {
   const assetsCode = getAssetsCode(assets);
 };
-
 
 export const mapStateToProps = (state: MainState): object => {
 
