@@ -49,15 +49,31 @@ const handleError = (error: object): ILoadingAssetsError => ({
 // ---------------------------- Async action creator  ------------------------------------------
 // ---------------------------------------------------------------------------------------------
 
+export async function getAssetsAPI(): Promise<any> {
+  const requestUrl = `https://min-api.cryptocompare.com/data/all/coinlist`;
 
-const fetchAssets = () => {
-  return (dispatch: Dispatch<IState>) => {
+  const response = await fetch(requestUrl);
+
+  if (response.ok) {
+    return await response.json();
+  } else {
+    throw new Error();
+  }
+}
+
+export function fetchAssets(): (dispatch: Dispatch<IState>) => Promise<void> {
+  return async (dispatch: Dispatch<IState>) => {
     dispatch(loading(true));
-    return fetch(`https://min-api.cryptocompare.com/data/all/coinlist`)
-      .then(json => dispatch(assetsFetched(json)))
-      .catch(error => dispatch(handleError(error)));
+
+    try {
+      const response = await getAssetsAPI();
+
+      dispatch(assetsFetched(response));
+    } catch (err) {
+      dispatch(handleError(err));
+    }
   };
-};
+}
 
 // ---------------------------------------------------------------------------------------------
 // ----------------------------         Reducer       ------------------------------------------
@@ -140,6 +156,6 @@ export const mapStateToProps = (state: MainState): object => {
 // ---------------------------- Action bind creators  ------------------------------------------
 // ---------------------------------------------------------------------------------------------
 
-export const mapActionToDispatch = (dispatch: Dispatch<IState>) => {
+export const mapActionToDispatch = (dispatch: Dispatch<any>) => {
   return bindActionCreators({ fetchAssets }, dispatch);
 };

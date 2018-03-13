@@ -13,7 +13,7 @@ import TextField from 'material-ui/TextField';
 
 interface IProps {
   assets: object;
-  fetchAssets(): () => Promise<IState>;
+  fetchAssets(): () => any;
 }
 
 class App extends React.Component<IProps, {}> {
