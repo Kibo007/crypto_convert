@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { mapStateToProps, mapActionToDispatch } from '../../data/modules/app';
+import {mapStateToProps, mapActionToDispatch, IState} from '../../data/modules/app';
 import './app.scss';
 import './../styles/layout.scss';
 
@@ -13,7 +13,7 @@ import TextField from 'material-ui/TextField';
 
 interface IProps {
   assets: object;
-  fetchAssets(): Function;
+  fetchAssets(): () => Promise<IState>;
 }
 
 class App extends React.Component<IProps, {}> {

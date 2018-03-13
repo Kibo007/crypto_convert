@@ -64,13 +64,19 @@ const fetchAssets = (): object => {
 // ---------------------------------------------------------------------------------------------
 
 const initialState = {
-  assets: {},
+  assets: {
+    Data: {},
+  },
   loading: false,
   error: {},
 };
 
+interface IAssets {
+  Data: object;
+}
+
 export interface IState {
-  assets: object,
+  assets: IAssets,
   loading: boolean,
   error: object,
 }
@@ -80,9 +86,14 @@ type Action = IAssetsUpdate | ILoadingUpdate | ILoadingAssetsError;
 export const app: Reducer<IState> = (state: IState = initialState, action: Action): IState => {
   switch (action.type) {
     case ActionTypes.ALL_ASSETS_FETCHED:
+      debugger;
+
       return {
         ...state,
-        assets: action.payload,
+        assets: {
+          ...state.assets,
+          ...action.payload,
+        },
       };
     case ActionTypes.ERROR_LOADING_ASSETS:
       return {
@@ -99,13 +110,30 @@ export const app: Reducer<IState> = (state: IState = initialState, action: Actio
   }
 };
 
+
+
 // ---------------------------------------------------------------------------------------------
 // ----------------------------        Selectors      ------------------------------------------
 // ---------------------------------------------------------------------------------------------
+interface IAssets {
+  Data: object;
+}
+
+const getAssetsCode = (assets: IAssets) => {
+  return Object.keys(assets.Data);
+};
+
+const getAssets = (assets: IAssets) => {
+  const assetsCode = getAssetsCode(assets);
+};
+
 
 export const mapStateToProps = (state: MainState): object => {
+
   return {
-    assets: state.app.assets,
+    assets: getAssets(state.app.assets),
+    loading: state.app.loading,
+    error: state.app.error,
   };
 };
 
