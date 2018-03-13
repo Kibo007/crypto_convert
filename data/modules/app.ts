@@ -102,8 +102,6 @@ type Action = IAssetsUpdate | ILoadingUpdate | ILoadingAssetsError;
 export const app: Reducer<IState> = (state: IState = initialState, action: Action): IState => {
   switch (action.type) {
     case ActionTypes.ALL_ASSETS_FETCHED:
-      debugger;
-
       return {
         ...state,
         assets: {
@@ -131,16 +129,35 @@ export const app: Reducer<IState> = (state: IState = initialState, action: Actio
 // ---------------------------------------------------------------------------------------------
 // ----------------------------        Selectors      ------------------------------------------
 // ---------------------------------------------------------------------------------------------
+
+interface IData {
+  [index: string] : string;
+}
+
 interface IAssets {
   Data: object;
 }
 
-const getAssetsCode = (assets: IAssets) => {
-  return Object.keys(assets.Data);
-};
+export interface IAssetsMapped {
+  symbol: string;
+  coinName: string;
+  imageUrl: string;
+}
 
-const getAssets = (assets: IAssets) => {
-  const assetsCode = getAssetsCode(assets);
+const getAssets = (assets: any): IAssetsMapped[] => {
+  const allAssetsData = assets.Data;
+  const assetsCode = Object.keys(allAssetsData);
+  const assetsMaped: IAssetsMapped[] = [];
+
+  assetsCode.map((asset: string) => {
+    assetsMaped.push({
+      symbol: allAssetsData[asset].Symbol,
+      coinName: allAssetsData[asset].CoinName,
+      imageUrl: `${assets.BaseImageUrl}${allAssetsData[asset].ImageUrl}`,
+    });
+  });
+
+  return assetsMaped;
 };
 
 export const mapStateToProps = (state: MainState): object => {

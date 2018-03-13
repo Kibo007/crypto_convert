@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
-import {mapStateToProps, mapActionToDispatch, IState} from '../../data/modules/app';
+import {connect} from 'react-redux';
+import {mapStateToProps, mapActionToDispatch, IAssetsMapped} from '../../data/modules/app';
 import './app.scss';
 import './../styles/layout.scss';
 
@@ -8,11 +8,11 @@ import AssetSelect from './../components/assetSelect/AssetSelect';
 import NavigationBar from './../components/navigationBar/NavigationBar';
 
 import Divider from 'material-ui/Divider';
-import { List } from 'material-ui/List';
+import {List} from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 
 interface IProps {
-  assets: object;
+  assets: IAssetsMapped[];
   fetchAssets(): () => any;
 }
 
@@ -27,20 +27,31 @@ class App extends React.Component<IProps, {}> {
       <div>
         <NavigationBar title="Crypto convert"/>
         <List>
-          <div data-layout="column" data-layout-align="center center" >
+          <div data-layout="column" data-layout-align="center center">
             <TextField
               floatingLabelText="Amount of assets to convert"
               hintText="0"
               floatingLabelFixed={false}
               type="number"
             />
-            <AssetSelect />
+            <AssetSelect/>
           </div>
 
-          <Divider />
+          <ul>
+            {this.props.assets.map((asset: IAssetsMapped) => {
+              return (
+                <li>
+                  {asset.symbol} {asset.coinName}
+                  <img src={asset.imageUrl} alt={asset.coinName}/>
+                </li>
+              );
+            })}
+          </ul>
 
-          <div data-layout="column" data-layout-align="center center" >
-            <AssetSelect />
+          <Divider/>
+
+          <div data-layout="column" data-layout-align="center center">
+            <AssetSelect/>
           </div>
 
         </List>
