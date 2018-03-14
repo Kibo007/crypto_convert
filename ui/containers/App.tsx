@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { connect } from 'react-redux';
-import { mapStateToProps, mapActionToDispatch, IMapStateToProps } from '../../data/modules/app';
+import {connect} from 'react-redux';
+import {mapStateToProps, mapActionToDispatch, IMapStateToProps} from '../../data/modules/app';
 import './app.scss';
 import './../styles/layout.scss';
 
@@ -8,15 +8,16 @@ import AssetSelect from './../components/assetSelect/AssetSelect';
 import NavigationBar from './../components/navigationBar/NavigationBar';
 
 import Divider from 'material-ui/Divider';
-import { List } from 'material-ui/List';
+import {List} from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 
 interface IProps extends IMapStateToProps {
   fetchAssets(): () => any;
   updatePrimarySelectedAsset(): () => any;
-  updatePrimaryAssetAmount(): () => any;
+  updatePrimaryAssetAmount(value: string): () => any;
   updateSecondarySelectedAsset(): () => any;
 }
+
 
 class App extends React.Component<IMapStateToProps & IProps, {}> {
 
@@ -35,12 +36,17 @@ class App extends React.Component<IMapStateToProps & IProps, {}> {
               hintText="0"
               floatingLabelFixed={false}
               type="number"
+              onChange={
+                (e: React.ChangeEvent<HTMLInputElement>) =>
+                  this.props.updatePrimaryAssetAmount(e.target.value)
+              }
+              value={this.props.primaryAsset.amount}
             />
             <br/>
             <AssetSelect
-              assets={ this.props.assets }
-              selectedAsset={ this.props.primaryAsset.asset }
-              updateSelectedAsset={ this.props.updatePrimarySelectedAsset }
+              assets={this.props.assets}
+              selectedAsset={this.props.primaryAsset.asset}
+              updateSelectedAsset={this.props.updatePrimarySelectedAsset}
             />
           </div>
 
@@ -49,7 +55,11 @@ class App extends React.Component<IMapStateToProps & IProps, {}> {
           <Divider/>
 
           <div data-layout="column" data-layout-align="center center">
-            {/*<AssetSelect/>*/}
+            <AssetSelect
+              assets={this.props.assets}
+              selectedAsset={this.props.secondaryAsset.asset}
+              updateSelectedAsset={this.props.updateSecondarySelectedAsset}
+            />
           </div>
 
         </List>

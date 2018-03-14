@@ -36,9 +36,9 @@ interface IUpdatePrimaryAssetAmount {
   payload: number;
 }
 
-const updatePrimaryAssetAmount = (amount: number): IUpdatePrimaryAssetAmount => ({
+const updatePrimaryAssetAmount = (amount: string): IUpdatePrimaryAssetAmount => ({
   type: ActionTypes.UPDATE_PRIMARY_ASSET_AMOUNT,
-  payload: amount,
+  payload: parseInt(amount, 10),
 });
 
 interface IPayloadAsset {
@@ -170,6 +170,7 @@ type Action = IAssetsFetched
   | ILoadingUpdate
   | ILoadingAssetsError
   | IUpdatePrimarySelectedAsset
+  | IUpdatePrimaryAssetAmount
   | IUpdateSecondarySelectedAsset;
 
 export const app: Reducer<IState> = (state: IState = initialState, action: Action): IState => {
@@ -203,6 +204,14 @@ export const app: Reducer<IState> = (state: IState = initialState, action: Actio
           asset: action.payload,
         },
       };
+    case ActionTypes.UPDATE_PRIMARY_ASSET_AMOUNT:
+      return {
+        ...state,
+        primaryAsset: {
+          ...state.secondaryAsset,
+          amount: action.payload,
+        },
+      };
     case ActionTypes.LOADING:
       return {
         ...state,
@@ -212,8 +221,6 @@ export const app: Reducer<IState> = (state: IState = initialState, action: Actio
       return state;
   }
 };
-
-
 
 // ---------------------------------------------------------------------------------------------
 // ----------------------------        Selectors      ------------------------------------------
