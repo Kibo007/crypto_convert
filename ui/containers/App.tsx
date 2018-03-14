@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {connect} from 'react-redux';
-import {mapStateToProps, mapActionToDispatch, IMapStateToProps} from '../../data/modules/app';
+import { connect } from 'react-redux';
+import { mapStateToProps, mapActionToDispatch, IMapStateToProps } from '../../data/modules/app';
 import './app.scss';
 import './../styles/layout.scss';
 
@@ -8,7 +8,7 @@ import AssetSelect from './../components/assetSelect/AssetSelect';
 import NavigationBar from './../components/navigationBar/NavigationBar';
 
 import Divider from 'material-ui/Divider';
-import {List} from 'material-ui/List';
+import { List } from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 
 interface IProps extends IMapStateToProps {
@@ -16,10 +16,11 @@ interface IProps extends IMapStateToProps {
   updatePrimarySelectedAsset(): () => any;
   updatePrimaryAssetAmount(value: string): () => any;
   updateSecondarySelectedAsset(): () => any;
+  updateAssetSearch(value: string): () => any;
 }
 
 
-class App extends React.Component<IMapStateToProps & IProps, {}> {
+class App extends React.Component<IProps, {}> {
 
   componentWillMount() {
     this.props.fetchAssets();
@@ -47,6 +48,8 @@ class App extends React.Component<IMapStateToProps & IProps, {}> {
               assets={this.props.assets}
               selectedAsset={this.props.primaryAsset.asset}
               updateSelectedAsset={this.props.updatePrimarySelectedAsset}
+              updateAssetSearch={this.props.updateAssetSearch}
+              assetSearch={this.props.assetSearch}
             />
           </div>
 
@@ -59,6 +62,8 @@ class App extends React.Component<IMapStateToProps & IProps, {}> {
               assets={this.props.assets}
               selectedAsset={this.props.secondaryAsset.asset}
               updateSelectedAsset={this.props.updateSecondarySelectedAsset}
+              updateAssetSearch={this.props.updateAssetSearch}
+              assetSearch={this.props.assetSearch}
             />
           </div>
 

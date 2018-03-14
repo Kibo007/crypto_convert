@@ -11,6 +11,7 @@ enum ActionTypes {
   UPDATE_PRIMARY_SELECTED_ASSET = 'UPDATE_PRIMARY_SELECTED_ASSET',
   UPDATE_PRIMARY_ASSET_AMOUNT = 'UPDATE_PRIMARY_ASSET_AMOUNT',
   UPDATE_SECONDARY_SELECTED_ASSET = 'UPDATE_SECONDARY_SELECTED_ASSET',
+  UPDATE_ASSET_SEARCH = 'UPDATE_ASSET_SEARCH',
   ERROR_LOADING_ASSETS = 'ERROR_LOADING_ASSETS',
   LOADING = 'LOADING',
 }
@@ -22,7 +23,7 @@ interface IObject {
   payload: object;
 }
 
-interface IAssetsFetched extends IObject{
+interface IAssetsFetched extends IObject {
   type: ActionTypes.ALL_ASSETS_FETCHED;
 }
 
@@ -83,6 +84,16 @@ const handleError = (error: object): ILoadingAssetsError => ({
   payload: error,
 });
 
+interface IAssetSearch {
+  type: ActionTypes.UPDATE_ASSET_SEARCH;
+  payload: string;
+}
+
+const updateAssetSearch = (search: string): IAssetSearch => ({
+  type: ActionTypes.UPDATE_ASSET_SEARCH,
+  payload: search,
+});
+
 // ---------------------------------------------------------------------------------------------
 // ---------------------------- Async action creator  ------------------------------------------
 // ---------------------------------------------------------------------------------------------
@@ -126,7 +137,7 @@ interface IAssets {
   Data: object;
 }
 
-type IPrimaryAsset = {
+export type IPrimaryAsset = {
   amount: number;
   asset: IAssetMapped;
 };
@@ -137,6 +148,7 @@ type ISecondaryAsset = {
 
 export interface IState {
   assets: IAssets;
+  assetSearch: string;
   primaryAsset: IPrimaryAsset;
   secondaryAsset: ISecondaryAsset;
   loading: boolean;
@@ -147,6 +159,7 @@ const initialState = {
   assets: {
     Data: {},
   },
+  assetSearch: '',
   primaryAsset: {
     amount: 0,
     asset: {
@@ -167,6 +180,7 @@ const initialState = {
 };
 
 type Action = IAssetsFetched
+  | IAssetSearch
   | ILoadingUpdate
   | ILoadingAssetsError
   | IUpdatePrimarySelectedAsset
@@ -212,6 +226,11 @@ export const app: Reducer<IState> = (state: IState = initialState, action: Actio
           amount: action.payload,
         },
       };
+    case ActionTypes.UPDATE_ASSET_SEARCH:
+      return {
+        ...state,
+        assetSearch: action.payload,
+      };
     case ActionTypes.LOADING:
       return {
         ...state,
@@ -248,6 +267,7 @@ const getAssets = (assets: any): IAssetMapped[] => {
 
 export interface IMapStateToProps {
   assets: IAssetMapped[];
+  assetSearch: string;
   primaryAsset: IPrimaryAsset;
   secondaryAsset: ISecondaryAsset;
   loading: boolean;
@@ -255,9 +275,24 @@ export interface IMapStateToProps {
 }
 
 export const mapStateToProps = (state: MainState): IMapStateToProps => {
+  const assets = getAssets(state.app.assets).filter((asset: IAssetMapped) => {
+
+    if (state.app.assetSearch === '') {
+      return asset;
+    }
+
+    const symbolIndex: number = asset.symbol
+      .toLowerCase()
+      .indexOf(state.app.assetSearch.toLowerCase());
+
+    if (symbolIndex !== -1) {
+      return asset;
+    }
+  });
 
   return {
-    assets: getAssets(state.app.assets),
+    assets,
+    assetSearch: state.app.assetSearch,
     primaryAsset: state.app.primaryAsset,
     secondaryAsset: state.app.secondaryAsset,
     loading: state.app.loading,
@@ -276,6 +311,7 @@ export const mapActionToDispatch = (dispatch: Dispatch<Action>) => {
       updatePrimarySelectedAsset,
       updatePrimaryAssetAmount,
       updateSecondarySelectedAsset,
+      updateAssetSearch,
     },
     dispatch,
   );

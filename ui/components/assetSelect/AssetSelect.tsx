@@ -1,6 +1,8 @@
 import * as React from 'react';
 import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
+import TextField from 'material-ui/TextField';
+import { IPrimaryAsset } from '../../../data/modules/app';
 
 type Asset = {
   symbol: string;
@@ -9,9 +11,12 @@ type Asset = {
 };
 
 interface IProps {
+  primaryAsset?: IPrimaryAsset;
   assets: Asset[];
   selectedAsset: Asset;
+  assetSearch: string;
   updateSelectedAsset(): () => any;
+  updateAssetSearch(value: string): () => any;
 }
 
 class AssetSelect extends React.Component<IProps, {}> {
@@ -40,7 +45,16 @@ class AssetSelect extends React.Component<IProps, {}> {
         }
 
         <Dialog
-          title="Scrollable Dialog"
+          title={<TextField
+            floatingLabelText="Search for asset by symbol"
+            hintText="ETN"
+            floatingLabelFixed={false}
+            onChange={
+              (e: React.ChangeEvent<HTMLInputElement>) =>
+                this.props.updateAssetSearch(e.target.value)
+            }
+            value={this.props.assetSearch}
+          />}
           modal={false}
           open={this.state.open}
           onRequestClose={this.handleClose}
