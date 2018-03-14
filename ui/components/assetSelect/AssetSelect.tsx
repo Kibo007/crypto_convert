@@ -3,6 +3,8 @@ import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
 import { IPrimaryAsset } from '../../../data/modules/app';
+// import styles from './assets-search.scss';
+const styles = require('./assets-search.scss');
 
 type Asset = {
   symbol: string;
@@ -63,9 +65,14 @@ class AssetSelect extends React.Component<IProps, {}> {
           <ul>
             {this.props.assets.map((asset: Asset, i: number) => {
               return (
-                <li key={i} onClick={this.handleClose}>
-                  {asset.symbol} {asset.coinName}
-                  <img src={asset.imageUrl} alt={asset.coinName}/>
+                <li key={i}
+                    onClick={this.handleClose}
+                    data-layout="row" data-layout-align="space-between center"
+                    className={styles.asset}
+                >
+                  <img className={styles.image} src={asset.imageUrl} alt={asset.coinName}/>
+                  <span>{asset.symbol}</span>
+                  <span>{asset.coinName}</span>
                 </li>
               );
             })}

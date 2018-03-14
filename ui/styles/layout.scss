@@ -4,6 +4,15 @@
  ------------------------------ ------------------------------ ------------------------------ ------------------------------
 */
 
+li {
+  list-style: none;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+}
+
 [data-layout] {
   box-sizing: border-box;
   display: flex!important;

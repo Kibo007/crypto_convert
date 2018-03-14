@@ -1,6 +1,6 @@
 import 'isomorphic-fetch';
-import { bindActionCreators, Dispatch, Reducer } from 'redux';
-import { MainState } from './../store';
+import {bindActionCreators, Dispatch, Reducer} from 'redux';
+import {MainState} from './../store';
 
 // ---------------------------------------------------------------------------------------------
 // ----------------------------     Action type     --------------------------------------------
@@ -274,6 +274,20 @@ export interface IMapStateToProps {
   error: object;
 }
 
+export const sortByName = (a: string, b: string, direction: boolean): number => {
+  const nameA = a.toUpperCase(); // ignore upper and lowercase
+  const nameB = b.toUpperCase(); // ignore upper and lowercase
+  if (nameA < nameB) {
+    return direction ? -1 : 1;
+  }
+  if (nameA > nameB) {
+    return direction ? 1 : -1;
+  }
+
+  // names must be equal
+  return 0;
+};
+
 export const mapStateToProps = (state: MainState): IMapStateToProps => {
   const assets = getAssets(state.app.assets).filter((asset: IAssetMapped) => {
 
@@ -288,6 +302,8 @@ export const mapStateToProps = (state: MainState): IMapStateToProps => {
     if (symbolIndex !== -1) {
       return asset;
     }
+  }).sort((a, b) => {
+    return sortByName(a.coinName, b.coinName, true);
   });
 
   return {
