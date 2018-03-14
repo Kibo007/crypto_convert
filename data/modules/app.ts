@@ -8,6 +8,9 @@ import { MainState } from './../store';
 
 enum ActionTypes {
   ALL_ASSETS_FETCHED = 'ALL_ASSETS_FETCHED',
+  UPDATE_PRIMARY_SELECTED_ASSET = 'UPDATE_PRIMARY_SELECTED_ASSET',
+  UPDATE_PRIMARY_ASSET_AMOUNT = 'UPDATE_PRIMARY_ASSET_AMOUNT',
+  UPDATE_SECONDARY_SELECTED_ASSET = 'UPDATE_SECONDARY_SELECTED_ASSET',
   ERROR_LOADING_ASSETS = 'ERROR_LOADING_ASSETS',
   LOADING = 'LOADING',
 }
@@ -15,19 +18,54 @@ enum ActionTypes {
 // ---------------------------------------------------------------------------------------------
 // ---------------------------- Action creator  ------------------------------------------------
 // ---------------------------------------------------------------------------------------------
-interface IAssetsUpdate {
-  readonly type: ActionTypes.ALL_ASSETS_FETCHED;
-  readonly payload: object;
+interface IObject {
+  payload: object;
 }
 
-const assetsFetched = (assets: object): IAssetsUpdate => ({
+interface IAssetsFetched extends IObject{
+  type: ActionTypes.ALL_ASSETS_FETCHED;
+}
+
+const assetsFetched = (assets: object): IAssetsFetched => ({
   type: ActionTypes.ALL_ASSETS_FETCHED,
   payload: assets,
 });
 
+interface IUpdatePrimaryAssetAmount {
+  type: ActionTypes.UPDATE_PRIMARY_ASSET_AMOUNT;
+  payload: number;
+}
+
+const updatePrimaryAssetAmount = (amount: number): IUpdatePrimaryAssetAmount => ({
+  type: ActionTypes.UPDATE_PRIMARY_ASSET_AMOUNT,
+  payload: amount,
+});
+
+interface IPayloadAsset {
+  payload: IAssetMapped;
+}
+
+interface IUpdatePrimarySelectedAsset extends IPayloadAsset {
+  type: ActionTypes.UPDATE_PRIMARY_SELECTED_ASSET;
+}
+
+const updatePrimarySelectedAsset = (asset: IAssetMapped): IUpdatePrimarySelectedAsset => ({
+  type: ActionTypes.UPDATE_PRIMARY_SELECTED_ASSET,
+  payload: asset,
+});
+
+interface IUpdateSecondarySelectedAsset extends IPayloadAsset {
+  type: ActionTypes.UPDATE_SECONDARY_SELECTED_ASSET;
+}
+
+const updateSecondarySelectedAsset = (asset: IAssetMapped): IUpdateSecondarySelectedAsset => ({
+  type: ActionTypes.UPDATE_SECONDARY_SELECTED_ASSET,
+  payload: asset,
+});
+
 interface ILoadingUpdate {
-  readonly type: ActionTypes.LOADING;
-  readonly payload: boolean;
+  type: ActionTypes.LOADING;
+  payload: boolean;
 }
 
 const loading = (isLoading: boolean): ILoadingUpdate => ({
@@ -36,8 +74,8 @@ const loading = (isLoading: boolean): ILoadingUpdate => ({
 });
 
 interface ILoadingAssetsError {
-  readonly type: ActionTypes.ERROR_LOADING_ASSETS;
-  readonly payload: object;
+  type: ActionTypes.ERROR_LOADING_ASSETS;
+  payload: object;
 }
 
 const handleError = (error: object): ILoadingAssetsError => ({
@@ -78,26 +116,61 @@ export function fetchAssets(): (dispatch: Dispatch<IState>) => Promise<void> {
 // ---------------------------------------------------------------------------------------------
 // ----------------------------         Reducer       ------------------------------------------
 // ---------------------------------------------------------------------------------------------
-
-const initialState = {
-  assets: {
-    Data: {},
-  },
-  loading: false,
-  error: {},
+export type IAssetMapped = {
+  symbol: string;
+  coinName: string;
+  imageUrl: string;
 };
 
 interface IAssets {
   Data: object;
 }
 
+type IPrimaryAsset = {
+  amount: number;
+  asset: IAssetMapped;
+};
+
+type ISecondaryAsset = {
+  asset: IAssetMapped;
+};
+
 export interface IState {
-  assets: IAssets,
-  loading: boolean,
-  error: object,
+  assets: IAssets;
+  primaryAsset: IPrimaryAsset;
+  secondaryAsset: ISecondaryAsset;
+  loading: boolean;
+  error: object;
 }
 
-type Action = IAssetsUpdate | ILoadingUpdate | ILoadingAssetsError;
+const initialState = {
+  assets: {
+    Data: {},
+  },
+  primaryAsset: {
+    amount: 0,
+    asset: {
+      symbol: '',
+      coinName: '',
+      imageUrl: '',
+    },
+  },
+  secondaryAsset: {
+    asset: {
+      symbol: '',
+      coinName: '',
+      imageUrl: '',
+    },
+  },
+  loading: false,
+  error: {},
+};
+
+type Action = IAssetsFetched
+  | ILoadingUpdate
+  | ILoadingAssetsError
+  | IUpdatePrimarySelectedAsset
+  | IUpdateSecondarySelectedAsset;
 
 export const app: Reducer<IState> = (state: IState = initialState, action: Action): IState => {
   switch (action.type) {
@@ -113,6 +186,22 @@ export const app: Reducer<IState> = (state: IState = initialState, action: Actio
       return {
         ...state,
         error: action.payload,
+      };
+    case ActionTypes.UPDATE_PRIMARY_SELECTED_ASSET:
+      return {
+        ...state,
+        primaryAsset: {
+          ...state.primaryAsset,
+          asset: action.payload,
+        },
+      };
+    case ActionTypes.UPDATE_SECONDARY_SELECTED_ASSET:
+      return {
+        ...state,
+        secondaryAsset: {
+          ...state.secondaryAsset,
+          asset: action.payload,
+        },
       };
     case ActionTypes.LOADING:
       return {
@@ -130,24 +219,14 @@ export const app: Reducer<IState> = (state: IState = initialState, action: Actio
 // ----------------------------        Selectors      ------------------------------------------
 // ---------------------------------------------------------------------------------------------
 
-interface IData {
-  [index: string] : string;
-}
-
 interface IAssets {
   Data: object;
 }
 
-export interface IAssetsMapped {
-  symbol: string;
-  coinName: string;
-  imageUrl: string;
-}
-
-const getAssets = (assets: any): IAssetsMapped[] => {
+const getAssets = (assets: any): IAssetMapped[] => {
   const allAssetsData = assets.Data;
   const assetsCode = Object.keys(allAssetsData);
-  const assetsMaped: IAssetsMapped[] = [];
+  const assetsMaped: IAssetMapped[] = [];
 
   assetsCode.map((asset: string) => {
     assetsMaped.push({
@@ -160,10 +239,20 @@ const getAssets = (assets: any): IAssetsMapped[] => {
   return assetsMaped;
 };
 
-export const mapStateToProps = (state: MainState): object => {
+export interface IMapStateToProps {
+  assets: IAssetMapped[];
+  primaryAsset: IPrimaryAsset;
+  secondaryAsset: ISecondaryAsset;
+  loading: boolean;
+  error: object;
+}
+
+export const mapStateToProps = (state: MainState): IMapStateToProps => {
 
   return {
     assets: getAssets(state.app.assets),
+    primaryAsset: state.app.primaryAsset,
+    secondaryAsset: state.app.secondaryAsset,
     loading: state.app.loading,
     error: state.app.error,
   };
@@ -173,6 +262,14 @@ export const mapStateToProps = (state: MainState): object => {
 // ---------------------------- Action bind creators  ------------------------------------------
 // ---------------------------------------------------------------------------------------------
 
-export const mapActionToDispatch = (dispatch: Dispatch<any>) => {
-  return bindActionCreators({ fetchAssets }, dispatch);
+export const mapActionToDispatch = (dispatch: Dispatch<Action>) => {
+  return bindActionCreators(
+    {
+      fetchAssets,
+      updatePrimarySelectedAsset,
+      updatePrimaryAssetAmount,
+      updateSecondarySelectedAsset,
+    },
+    dispatch,
+  );
 };

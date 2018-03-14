@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {connect} from 'react-redux';
-import {mapStateToProps, mapActionToDispatch, IAssetsMapped} from '../../data/modules/app';
+import { connect } from 'react-redux';
+import { mapStateToProps, mapActionToDispatch, IMapStateToProps } from '../../data/modules/app';
 import './app.scss';
 import './../styles/layout.scss';
 
@@ -8,15 +8,17 @@ import AssetSelect from './../components/assetSelect/AssetSelect';
 import NavigationBar from './../components/navigationBar/NavigationBar';
 
 import Divider from 'material-ui/Divider';
-import {List} from 'material-ui/List';
+import { List } from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 
-interface IProps {
-  assets: IAssetsMapped[];
+interface IProps extends IMapStateToProps {
   fetchAssets(): () => any;
+  updatePrimarySelectedAsset(): () => any;
+  updatePrimaryAssetAmount(): () => any;
+  updateSecondarySelectedAsset(): () => any;
 }
 
-class App extends React.Component<IProps, {}> {
+class App extends React.Component<IMapStateToProps & IProps, {}> {
 
   componentWillMount() {
     this.props.fetchAssets();
@@ -34,24 +36,20 @@ class App extends React.Component<IProps, {}> {
               floatingLabelFixed={false}
               type="number"
             />
-            <AssetSelect/>
+            <br/>
+            <AssetSelect
+              assets={ this.props.assets }
+              selectedAsset={ this.props.primaryAsset.asset }
+              updateSelectedAsset={ this.props.updatePrimarySelectedAsset }
+            />
           </div>
 
-          <ul>
-            {this.props.assets.map((asset: IAssetsMapped) => {
-              return (
-                <li>
-                  {asset.symbol} {asset.coinName}
-                  <img src={asset.imageUrl} alt={asset.coinName}/>
-                </li>
-              );
-            })}
-          </ul>
-
+          <br/>
+          <br/>
           <Divider/>
 
           <div data-layout="column" data-layout-align="center center">
-            <AssetSelect/>
+            {/*<AssetSelect/>*/}
           </div>
 
         </List>
@@ -60,4 +58,8 @@ class App extends React.Component<IProps, {}> {
   }
 }
 
-export default connect(mapStateToProps, mapActionToDispatch)(App);
+export function mergeProps(stateProps: Object, dispatchProps: Object, ownProps: Object) {
+  return Object.assign({}, ownProps, stateProps, dispatchProps);
+}
+
+export default connect(mapStateToProps, mapActionToDispatch, mergeProps)(App);
