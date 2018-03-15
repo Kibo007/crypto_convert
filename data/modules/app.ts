@@ -295,13 +295,10 @@ export const mapStateToProps = (state: MainState): IMapStateToProps => {
       return asset;
     }
 
-    const symbolIndex: number = asset.symbol
+    return asset.symbol
       .toLowerCase()
-      .indexOf(state.app.assetSearch.toLowerCase());
+      .match(state.app.assetSearch.toLowerCase());
 
-    if (symbolIndex !== -1) {
-      return asset;
-    }
   }).sort((a, b) => {
     return sortByName(a.coinName, b.coinName, true);
   });

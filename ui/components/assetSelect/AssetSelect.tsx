@@ -21,20 +21,20 @@ interface IProps {
   updateAssetSearch(value: string): () => any;
 }
 
-class AssetSelect extends React.Component<IProps, {}> {
-  state: { open: boolean } = {
+class AssetSelect extends React.Component<IProps, {open: boolean}> {
+  readonly state  = {
     open: false,
   };
 
-  handleOpen = () => {
+  private handleOpen = () => {
     this.setState({ open: true });
   };
 
-  handleClose = () => {
+  private handleClose = () => {
     this.setState({ open: false });
   };
 
-  render() {
+  public render() {
     const hasSelectedAsset = this.props.selectedAsset.symbol.length > 0;
     return (
       <div>
