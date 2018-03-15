@@ -1,6 +1,6 @@
 import 'isomorphic-fetch';
-import {bindActionCreators, Dispatch, Reducer} from 'redux';
-import {MainState} from './../store';
+import { bindActionCreators, Dispatch, Reducer } from 'redux';
+import { MainState } from './../store';
 
 // ---------------------------------------------------------------------------------------------
 // ----------------------------     Action type     --------------------------------------------
@@ -10,6 +10,7 @@ enum ActionTypes {
   ALL_ASSETS_FETCHED = 'ALL_ASSETS_FETCHED',
   UPDATE_PRIMARY_SELECTED_ASSET = 'UPDATE_PRIMARY_SELECTED_ASSET',
   UPDATE_PRIMARY_ASSET_AMOUNT = 'UPDATE_PRIMARY_ASSET_AMOUNT',
+  UPDATE_SECONDARY_ASSET_AMOUNT = 'UPDATE_SECONDARY_ASSET_AMOUNT',
   UPDATE_SECONDARY_SELECTED_ASSET = 'UPDATE_SECONDARY_SELECTED_ASSET',
   UPDATE_ASSET_SEARCH = 'UPDATE_ASSET_SEARCH',
   ERROR_LOADING_ASSETS = 'ERROR_LOADING_ASSETS',
@@ -19,11 +20,12 @@ enum ActionTypes {
 // ---------------------------------------------------------------------------------------------
 // ---------------------------- Action creator  ------------------------------------------------
 // ---------------------------------------------------------------------------------------------
+
 interface IObject {
   payload: object;
 }
 
-interface IAssetsFetched extends IObject {
+export interface IAssetsFetched extends IObject {
   type: ActionTypes.ALL_ASSETS_FETCHED;
 }
 
@@ -32,7 +34,7 @@ const assetsFetched = (assets: object): IAssetsFetched => ({
   payload: assets,
 });
 
-interface IUpdatePrimaryAssetAmount {
+export interface IUpdatePrimaryAssetAmount {
   type: ActionTypes.UPDATE_PRIMARY_ASSET_AMOUNT;
   payload: number;
 }
@@ -42,11 +44,21 @@ const updatePrimaryAssetAmount = (amount: string): IUpdatePrimaryAssetAmount => 
   payload: parseInt(amount, 10),
 });
 
+export interface IUpdateSecondaryAssetAmount {
+  type: ActionTypes.UPDATE_SECONDARY_ASSET_AMOUNT;
+  payload: number;
+}
+
+const updateSecondaryAssetAmount = (amount: number): IUpdateSecondaryAssetAmount => ({
+  type: ActionTypes.UPDATE_SECONDARY_ASSET_AMOUNT,
+  payload: amount,
+});
+
 interface IPayloadAsset {
   payload: IAssetMapped;
 }
 
-interface IUpdatePrimarySelectedAsset extends IPayloadAsset {
+export interface IUpdatePrimarySelectedAsset extends IPayloadAsset {
   type: ActionTypes.UPDATE_PRIMARY_SELECTED_ASSET;
 }
 
@@ -55,7 +67,7 @@ const updatePrimarySelectedAsset = (asset: IAssetMapped): IUpdatePrimarySelected
   payload: asset,
 });
 
-interface IUpdateSecondarySelectedAsset extends IPayloadAsset {
+export interface IUpdateSecondarySelectedAsset extends IPayloadAsset {
   type: ActionTypes.UPDATE_SECONDARY_SELECTED_ASSET;
 }
 
@@ -84,7 +96,7 @@ const handleError = (error: object): ILoadingAssetsError => ({
   payload: error,
 });
 
-interface IAssetSearch {
+export interface IAssetSearch {
   type: ActionTypes.UPDATE_ASSET_SEARCH;
   payload: string;
 }
@@ -98,9 +110,7 @@ const updateAssetSearch = (search: string): IAssetSearch => ({
 // ---------------------------- Async action creator  ------------------------------------------
 // ---------------------------------------------------------------------------------------------
 
-export async function getAssetsAPI(): Promise<any> {
-  const requestUrl = `https://min-api.cryptocompare.com/data/all/coinlist`;
-
+export async function getAPI(requestUrl: string): Promise<any> {
   const response = await fetch(requestUrl);
 
   if (response.ok) {
@@ -115,7 +125,7 @@ export function fetchAssets(): (dispatch: Dispatch<IState>) => Promise<void> {
     dispatch(loading(true));
 
     try {
-      const response = await getAssetsAPI();
+      const response = await getAPI(`https://min-api.cryptocompare.com/data/all/coinlist`);
 
       dispatch(assetsFetched(response));
     } catch (err) {
@@ -124,9 +134,33 @@ export function fetchAssets(): (dispatch: Dispatch<IState>) => Promise<void> {
   };
 }
 
+export function fetchAssetsPrices(): (dispatch: Dispatch<IState>, getState: () => MainState) =>  Promise<void> {
+  return async (dispatch: Dispatch<IState>, getState: () => MainState) => {
+
+    const state: MainState = getState();
+    const primaryAssetAmount: number = state.app.primaryAsset.amount;
+    const primaryAssetSymbol: string = state.app.primaryAsset.asset.symbol;
+    const secondaryAssetSymbol: string = state.app.secondaryAsset.asset.symbol;
+    const primaryAssetURL = `https://min-api.cryptocompare.com/data/price?fsym=${primaryAssetSymbol}&tsyms=BTC`;
+    const secondaryAssetURL = `https://min-api.cryptocompare.com/data/price?fsym=${secondaryAssetSymbol}&tsyms=BTC`;
+
+    try {
+      const primaryAssetPrice: {BTC: number} = await getAPI(primaryAssetURL);
+      const secondaryAssetPrice: {BTC: number} = await getAPI(secondaryAssetURL);
+
+      const secondaryAssetAmount: number = (primaryAssetAmount * primaryAssetPrice.BTC) / secondaryAssetPrice.BTC;
+
+      dispatch(updateSecondaryAssetAmount(secondaryAssetAmount));
+    } catch (err) {
+      dispatch(handleError(err));
+    }
+  };
+}
+
 // ---------------------------------------------------------------------------------------------
 // ----------------------------         Reducer       ------------------------------------------
-// ---------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------\
+
 export type IAssetMapped = {
   symbol: string;
   coinName: string;
@@ -142,7 +176,8 @@ export type IPrimaryAsset = {
   asset: IAssetMapped;
 };
 
-type ISecondaryAsset = {
+export type ISecondaryAsset = {
+  amount: number;
   asset: IAssetMapped;
 };
 
@@ -155,13 +190,13 @@ export interface IState {
   error: object;
 }
 
-const initialState = {
+const initialState: IState = {
   assets: {
     Data: {},
   },
   assetSearch: '',
   primaryAsset: {
-    amount: 0,
+    amount: 1,
     asset: {
       symbol: '',
       coinName: '',
@@ -169,6 +204,7 @@ const initialState = {
     },
   },
   secondaryAsset: {
+    amount: null,
     asset: {
       symbol: '',
       coinName: '',
@@ -185,6 +221,7 @@ type Action = IAssetsFetched
   | ILoadingAssetsError
   | IUpdatePrimarySelectedAsset
   | IUpdatePrimaryAssetAmount
+  | IUpdateSecondaryAssetAmount
   | IUpdateSecondarySelectedAsset;
 
 export const app: Reducer<IState> = (state: IState = initialState, action: Action): IState => {
@@ -222,6 +259,14 @@ export const app: Reducer<IState> = (state: IState = initialState, action: Actio
       return {
         ...state,
         primaryAsset: {
+          ...state.primaryAsset,
+          amount: action.payload,
+        },
+      };
+    case ActionTypes.UPDATE_SECONDARY_ASSET_AMOUNT:
+      return {
+        ...state,
+        secondaryAsset: {
           ...state.secondaryAsset,
           amount: action.payload,
         },
@@ -256,9 +301,9 @@ const getAssets = (assets: any): IAssetMapped[] => {
 
   assetsCode.map((asset: string) => {
     assetsMaped.push({
-      symbol: allAssetsData[asset].Symbol,
-      coinName: allAssetsData[asset].CoinName,
-      imageUrl: `${assets.BaseImageUrl}${allAssetsData[asset].ImageUrl}`,
+      symbol: allAssetsData[ asset ].Symbol,
+      coinName: allAssetsData[ asset ].CoinName,
+      imageUrl: `${assets.BaseImageUrl}${allAssetsData[ asset ].ImageUrl}`,
     });
   });
 
@@ -277,10 +322,10 @@ export interface IMapStateToProps {
 export const sortByName = (a: string, b: string, direction: boolean): number => {
   const nameA = a.toUpperCase(); // ignore upper and lowercase
   const nameB = b.toUpperCase(); // ignore upper and lowercase
-  if (nameA < nameB) {
+  if ( nameA < nameB ) {
     return direction ? -1 : 1;
   }
-  if (nameA > nameB) {
+  if ( nameA > nameB ) {
     return direction ? 1 : -1;
   }
 
@@ -291,7 +336,7 @@ export const sortByName = (a: string, b: string, direction: boolean): number => 
 export const mapStateToProps = (state: MainState): IMapStateToProps => {
   const assets = getAssets(state.app.assets).filter((asset: IAssetMapped) => {
 
-    if (state.app.assetSearch === '') {
+    if ( state.app.assetSearch === '' ) {
       return asset;
     }
 
@@ -325,6 +370,7 @@ export const mapActionToDispatch = (dispatch: Dispatch<Action>) => {
       updatePrimaryAssetAmount,
       updateSecondarySelectedAsset,
       updateAssetSearch,
+      fetchAssetsPrices,
     },
     dispatch,
   );

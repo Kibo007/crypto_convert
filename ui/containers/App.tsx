@@ -1,24 +1,35 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import { mapStateToProps, mapActionToDispatch, IMapStateToProps } from '../../data/modules/app';
+import {
+  mapStateToProps,
+  mapActionToDispatch,
+  IMapStateToProps,
+  IAssetMapped,
+  IUpdatePrimarySelectedAsset,
+  IUpdateSecondarySelectedAsset,
+  IAssetSearch,
+  IUpdatePrimaryAssetAmount,
+  IAssetsFetched,
+} from '../../data/modules/app';
 import './app.scss';
 import './../styles/layout.scss';
 
 import AssetSelect from './../components/assetSelect/AssetSelect';
 import NavigationBar from './../components/navigationBar/NavigationBar';
+import Result from './../components/result/Result';
 
 import Divider from 'material-ui/Divider';
 import { List } from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 
 interface IProps extends IMapStateToProps {
-  fetchAssets(): () => any;
-  updatePrimarySelectedAsset(): () => any;
-  updatePrimaryAssetAmount(value: string): () => any;
-  updateSecondarySelectedAsset(): () => any;
-  updateAssetSearch(value: string): () => any;
+  fetchAssets(): () => IAssetsFetched;
+  updatePrimarySelectedAsset(asset: IAssetMapped): () => IUpdatePrimarySelectedAsset;
+  updatePrimaryAssetAmount(value: string): () => IUpdatePrimaryAssetAmount;
+  updateSecondarySelectedAsset(asset: IAssetMapped): () => IUpdateSecondarySelectedAsset;
+  updateAssetSearch(value: string): () => IAssetSearch;
+  fetchAssetsPrices(): () => any;
 }
-
 
 class App extends React.Component<IProps, {}> {
 
@@ -27,43 +38,61 @@ class App extends React.Component<IProps, {}> {
   }
 
   public render() {
+    const { primaryAsset, secondaryAsset, assets, assetSearch } = this.props;
+    const isConvertAssetEnabled = primaryAsset.asset.symbol.length > 0
+      && primaryAsset.amount > 0
+      && secondaryAsset.asset.symbol.length > 0;
+
     return (
       <div>
         <NavigationBar title="Crypto convert"/>
         <List>
           <div data-layout="column" data-layout-align="center center">
             <TextField
-              floatingLabelText="Amount of assets to convert"
-              hintText="0"
-              floatingLabelFixed={false}
+              floatingLabelText="Add amount of assets to convert"
+              inputStyle={{ textAlign: 'center' }}
               type="number"
               onChange={
                 (e: React.ChangeEvent<HTMLInputElement>) =>
                   this.props.updatePrimaryAssetAmount(e.target.value)
               }
-              value={this.props.primaryAsset.amount}
+              value={primaryAsset.amount}
             />
             <br/>
             <AssetSelect
-              assets={this.props.assets}
-              selectedAsset={this.props.primaryAsset.asset}
+              assets={assets}
+              selectedAsset={primaryAsset.asset}
               updateSelectedAsset={this.props.updatePrimarySelectedAsset}
               updateAssetSearch={this.props.updateAssetSearch}
-              assetSearch={this.props.assetSearch}
+              assetSearch={assetSearch}
             />
           </div>
 
           <br/>
           <br/>
           <Divider/>
+          <br/>
+          <br/>
 
           <div data-layout="column" data-layout-align="center center">
             <AssetSelect
-              assets={this.props.assets}
-              selectedAsset={this.props.secondaryAsset.asset}
+              assets={assets}
+              selectedAsset={secondaryAsset.asset}
               updateSelectedAsset={this.props.updateSecondarySelectedAsset}
               updateAssetSearch={this.props.updateAssetSearch}
-              assetSearch={this.props.assetSearch}
+              assetSearch={assetSearch}
+            />
+          </div>
+
+          <br/>
+          <br/>
+
+          <div data-layout="column" data-layout-align="center center">
+            <Result
+              fetchAssetsPrices={this.props.fetchAssetsPrices}
+              secondaryAsset={secondaryAsset}
+              primaryAsset={primaryAsset}
+              isConvertAssetEnabled={isConvertAssetEnabled}
             />
           </div>
 

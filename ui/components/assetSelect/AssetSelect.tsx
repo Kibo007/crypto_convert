@@ -17,7 +17,7 @@ interface IProps {
   assets: Asset[];
   selectedAsset: Asset;
   assetSearch: string;
-  updateSelectedAsset(): () => any;
+  updateSelectedAsset(asset: Asset): () => any;
   updateAssetSearch(value: string): () => any;
 }
 
@@ -28,27 +28,42 @@ class AssetSelect extends React.Component<IProps, {open: boolean}> {
 
   private handleOpen = () => {
     this.setState({ open: true });
-  };
+  }
 
   private handleClose = () => {
     this.setState({ open: false });
-  };
+  }
+
+  private updateAsset = (asset: Asset) => {
+    this.props.updateSelectedAsset(asset);
+    this.handleClose();
+  }
 
   public render() {
     const hasSelectedAsset = this.props.selectedAsset.symbol.length > 0;
     return (
       <div>
         { hasSelectedAsset ?
-          <div onClick={this.handleOpen}>
-            {this.props.selectedAsset.symbol} {this.props.selectedAsset.coinName}
-            <img src={this.props.selectedAsset.imageUrl} alt={this.props.selectedAsset.coinName}/>
+          <div
+            onClick={this.handleOpen}
+            className={styles.selectedAsset}
+            data-layout="row" data-layout-align="space-between center"
+          >
+            <img
+              className={styles.image}
+              src={this.props.selectedAsset.imageUrl}
+              alt={this.props.selectedAsset.coinName}
+            />
+            <span>{this.props.selectedAsset.symbol}</span>
+            <span>{this.props.selectedAsset.coinName}</span>
           </div> :
           <RaisedButton label="select asset" onClick={this.handleOpen} />
         }
 
         <Dialog
           title={<TextField
-            floatingLabelText="Search for asset by symbol"
+            className={styles.search}
+            floatingLabelText="Search by symbol"
             hintText="ETN"
             floatingLabelFixed={false}
             onChange={
@@ -66,7 +81,7 @@ class AssetSelect extends React.Component<IProps, {open: boolean}> {
             {this.props.assets.map((asset: Asset, i: number) => {
               return (
                 <li key={i}
-                    onClick={this.handleClose}
+                    onClick={() => this.updateAsset(asset)}
                     data-layout="row" data-layout-align="space-between center"
                     className={styles.asset}
                 >
