@@ -23,7 +23,7 @@ class App extends React.Component<IProps, {}> {
   }
 
   public render() {
-    const { primaryAsset, secondaryAsset, assets, assetSearch } = this.props;
+    const { primaryAsset, secondaryAsset, assets, assetSearch, error, loading } = this.props;
     const isConvertAssetEnabled = primaryAsset.asset.symbol.length > 0
       && primaryAsset.amount > 0
       && secondaryAsset.asset.symbol.length > 0;
@@ -78,6 +78,8 @@ class App extends React.Component<IProps, {}> {
               secondaryAsset={secondaryAsset}
               primaryAsset={primaryAsset}
               isConvertAssetEnabled={isConvertAssetEnabled}
+              error={error}
+              loading={loading}
             />
           </div>
 

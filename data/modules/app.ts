@@ -15,6 +15,7 @@ import {
   IState,
   Action,
   IMapStateToProps,
+  ErrorMessage,
 } from './typeDefinition';
 
 // ---------------------------------------------------------------------------------------------
@@ -51,7 +52,7 @@ const loading = (isLoading: boolean): ILoadingUpdate => ({
   payload: isLoading,
 });
 
-const handleError = (error: object): ILoadingAssetsError => ({
+const handleError = (error: ErrorMessage): ILoadingAssetsError => ({
   type: ActionTypes.ERROR_LOADING_ASSETS,
   payload: error,
 });
@@ -91,6 +92,7 @@ export function fetchAssets(): (dispatch: Dispatch<IState>) => Promise<void> {
 
 export function fetchAssetsPrices(): (dispatch: Dispatch<IState>, getState: () => MainState) => Promise<void> {
   return async (dispatch: Dispatch<IState>, getState: () => MainState) => {
+    dispatch(loading(true));
 
     const state: MainState = getState();
     const primaryAssetAmount: number = state.app.primaryAsset.amount;
@@ -99,13 +101,22 @@ export function fetchAssetsPrices(): (dispatch: Dispatch<IState>, getState: () =
     const primaryAssetURL = `https://min-api.cryptocompare.com/data/price?fsym=${primaryAssetSymbol}&tsyms=BTC`;
     const secondaryAssetURL = `https://min-api.cryptocompare.com/data/price?fsym=${secondaryAssetSymbol}&tsyms=BTC`;
 
+    type APIResponse = { BTC?: number; Response?: string; Message?: string; };
+
     try {
-      const primaryAssetPrice: { BTC: number } = await getAPI(primaryAssetURL);
-      const secondaryAssetPrice: { BTC: number } = await getAPI(secondaryAssetURL);
+      const primaryAssetPrice: APIResponse = await getAPI(primaryAssetURL);
+      const secondaryAssetPrice: APIResponse = await getAPI(secondaryAssetURL);
+      dispatch(loading(false));
 
-      const secondaryAssetAmount: number = (primaryAssetAmount * primaryAssetPrice.BTC) / secondaryAssetPrice.BTC;
+      if (primaryAssetPrice.Response === 'Error') {
+        dispatch(handleError({ message: primaryAssetPrice.Message }));
+      } else if (secondaryAssetPrice.Response === 'Error') {
+        dispatch(handleError({ message: secondaryAssetPrice.Message }));
+      } else {
+        const secondaryAssetAmount: number = (primaryAssetAmount * primaryAssetPrice.BTC) / secondaryAssetPrice.BTC;
+        dispatch(updateSecondaryAssetAmount(secondaryAssetAmount));
+      }
 
-      dispatch(updateSecondaryAssetAmount(secondaryAssetAmount));
     } catch (err) {
       dispatch(handleError(err));
     }
@@ -138,7 +149,9 @@ const initialState: IState = {
     },
   },
   loading: false,
-  error: {},
+  error: {
+    message: '',
+  },
 };
 
 export const app: Reducer<IState> = (state: IState = initialState, action: Action): IState => {
@@ -154,7 +167,10 @@ export const app: Reducer<IState> = (state: IState = initialState, action: Actio
     case ActionTypes.ERROR_LOADING_ASSETS:
       return {
         ...state,
-        error: action.payload,
+        error: {
+          ...state.error,
+          ...action.payload,
+        },
       };
     case ActionTypes.UPDATE_PRIMARY_SELECTED_ASSET:
       return {
@@ -258,7 +274,9 @@ export const mapStateToProps = (state: MainState): IMapStateToProps => {
     primaryAsset: state.app.primaryAsset,
     secondaryAsset: state.app.secondaryAsset,
     loading: state.app.loading,
-    error: state.app.error,
+    error: {
+      message: state.app.error.message,
+    },
   };
 };
 

@@ -99,7 +99,7 @@ export interface IState {
   primaryAsset: IPrimaryAsset;
   secondaryAsset: ISecondaryAsset;
   loading: boolean;
-  error: object;
+  error: ErrorMessage;
 }
 
 export type Action = IAssetsFetched
@@ -114,6 +114,9 @@ export type Action = IAssetsFetched
 // ---------------------------------------------------------------------------------------------
 // ----------------------------        Selectors      ------------------------------------------
 // ---------------------------------------------------------------------------------------------
+export interface ErrorMessage {
+  message: string;
+}
 
 export interface IMapStateToProps {
   assets: IAsset[];
@@ -121,7 +124,7 @@ export interface IMapStateToProps {
   primaryAsset: IPrimaryAsset;
   secondaryAsset: ISecondaryAsset;
   loading: boolean;
-  error: object;
+  error: ErrorMessage;
 }
 
 

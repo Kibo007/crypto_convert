@@ -3,8 +3,15 @@ import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import { IPrimaryAsset, ISecondaryAsset } from '../../../data/modules/typeDefinition';
 import CircularProgress from 'material-ui/CircularProgress';
+const styles = require('./result.scss');
+
+type Error = {
+  message: string;
+};
 
 interface IProps {
+  loading: boolean;
+  error: Error;
   primaryAsset: IPrimaryAsset;
   secondaryAsset: ISecondaryAsset;
   isConvertAssetEnabled: boolean;
@@ -26,7 +33,7 @@ class Result extends React.Component<IProps, {open: boolean}> {
   }
 
   public render() {
-
+    const { primaryAsset, secondaryAsset, error } = this.props;
     return (
       <div>
 
@@ -38,18 +45,24 @@ class Result extends React.Component<IProps, {open: boolean}> {
         />
 
         <Dialog
-          title="result"
           modal={false}
           open={this.state.open}
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}
         >
-          {this.props.secondaryAsset.amount ?
-            <div>
-              <span>for {this.props.primaryAsset.amount} {this.props.primaryAsset.asset.symbol} </span>
-              <span>you can get {this.props.secondaryAsset.amount} {this.props.secondaryAsset.asset.symbol}</span>
+          {this.props.loading ?
+            <div className={styles.loader}>
+              <CircularProgress size={80} thickness={5} />
             </div> :
-            <CircularProgress size={80} thickness={5} />
+            <div className={styles.result}>
+              {error.message.length === 0 ?
+                <p>
+                  For <span className={styles.asset}>{primaryAsset.amount} {primaryAsset.asset.symbol} </span>
+                  you can get <span className={styles.asset}>{secondaryAsset.amount} {secondaryAsset.asset.symbol}</span>
+                </p> :
+                <p>{error.message}</p>
+              }
+            </div>
           }
         </Dialog>
       </div>
