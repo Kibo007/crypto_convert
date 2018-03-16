@@ -1,105 +1,60 @@
 import 'isomorphic-fetch';
 import { bindActionCreators, Dispatch, Reducer } from 'redux';
 import { MainState } from './../store';
-
-// ---------------------------------------------------------------------------------------------
-// ----------------------------     Action type     --------------------------------------------
-// ---------------------------------------------------------------------------------------------
-
-enum ActionTypes {
-  ALL_ASSETS_FETCHED = 'ALL_ASSETS_FETCHED',
-  UPDATE_PRIMARY_SELECTED_ASSET = 'UPDATE_PRIMARY_SELECTED_ASSET',
-  UPDATE_PRIMARY_ASSET_AMOUNT = 'UPDATE_PRIMARY_ASSET_AMOUNT',
-  UPDATE_SECONDARY_ASSET_AMOUNT = 'UPDATE_SECONDARY_ASSET_AMOUNT',
-  UPDATE_SECONDARY_SELECTED_ASSET = 'UPDATE_SECONDARY_SELECTED_ASSET',
-  UPDATE_ASSET_SEARCH = 'UPDATE_ASSET_SEARCH',
-  ERROR_LOADING_ASSETS = 'ERROR_LOADING_ASSETS',
-  LOADING = 'LOADING',
-}
+import {
+  ActionTypes,
+  IAssetsFetched,
+  IUpdatePrimaryAssetAmount,
+  IUpdateSecondaryAssetAmount,
+  IUpdatePrimarySelectedAsset,
+  IUpdateSecondarySelectedAsset,
+  ILoadingUpdate,
+  ILoadingAssetsError,
+  IAssetSearch,
+  IAsset,
+  IState,
+  Action,
+  IMapStateToProps,
+} from './typeDefinition';
 
 // ---------------------------------------------------------------------------------------------
 // ---------------------------- Action creator  ------------------------------------------------
 // ---------------------------------------------------------------------------------------------
-
-interface IObject {
-  payload: object;
-}
-
-export interface IAssetsFetched extends IObject {
-  type: ActionTypes.ALL_ASSETS_FETCHED;
-}
 
 const assetsFetched = (assets: object): IAssetsFetched => ({
   type: ActionTypes.ALL_ASSETS_FETCHED,
   payload: assets,
 });
 
-export interface IUpdatePrimaryAssetAmount {
-  type: ActionTypes.UPDATE_PRIMARY_ASSET_AMOUNT;
-  payload: number;
-}
-
 const updatePrimaryAssetAmount = (amount: string): IUpdatePrimaryAssetAmount => ({
   type: ActionTypes.UPDATE_PRIMARY_ASSET_AMOUNT,
   payload: parseInt(amount, 10),
 });
-
-export interface IUpdateSecondaryAssetAmount {
-  type: ActionTypes.UPDATE_SECONDARY_ASSET_AMOUNT;
-  payload: number;
-}
 
 const updateSecondaryAssetAmount = (amount: number): IUpdateSecondaryAssetAmount => ({
   type: ActionTypes.UPDATE_SECONDARY_ASSET_AMOUNT,
   payload: amount,
 });
 
-interface IPayloadAsset {
-  payload: IAssetMapped;
-}
-
-export interface IUpdatePrimarySelectedAsset extends IPayloadAsset {
-  type: ActionTypes.UPDATE_PRIMARY_SELECTED_ASSET;
-}
-
-const updatePrimarySelectedAsset = (asset: IAssetMapped): IUpdatePrimarySelectedAsset => ({
+const updatePrimarySelectedAsset = (asset: IAsset): IUpdatePrimarySelectedAsset => ({
   type: ActionTypes.UPDATE_PRIMARY_SELECTED_ASSET,
   payload: asset,
 });
 
-export interface IUpdateSecondarySelectedAsset extends IPayloadAsset {
-  type: ActionTypes.UPDATE_SECONDARY_SELECTED_ASSET;
-}
-
-const updateSecondarySelectedAsset = (asset: IAssetMapped): IUpdateSecondarySelectedAsset => ({
+const updateSecondarySelectedAsset = (asset: IAsset): IUpdateSecondarySelectedAsset => ({
   type: ActionTypes.UPDATE_SECONDARY_SELECTED_ASSET,
   payload: asset,
 });
-
-interface ILoadingUpdate {
-  type: ActionTypes.LOADING;
-  payload: boolean;
-}
 
 const loading = (isLoading: boolean): ILoadingUpdate => ({
   type: ActionTypes.LOADING,
   payload: isLoading,
 });
 
-interface ILoadingAssetsError {
-  type: ActionTypes.ERROR_LOADING_ASSETS;
-  payload: object;
-}
-
 const handleError = (error: object): ILoadingAssetsError => ({
   type: ActionTypes.ERROR_LOADING_ASSETS,
   payload: error,
 });
-
-export interface IAssetSearch {
-  type: ActionTypes.UPDATE_ASSET_SEARCH;
-  payload: string;
-}
 
 const updateAssetSearch = (search: string): IAssetSearch => ({
   type: ActionTypes.UPDATE_ASSET_SEARCH,
@@ -161,35 +116,6 @@ export function fetchAssetsPrices(): (dispatch: Dispatch<IState>, getState: () =
 // ----------------------------         Reducer       ------------------------------------------
 // ---------------------------------------------------------------------------------------------\
 
-export type IAssetMapped = {
-  symbol: string;
-  coinName: string;
-  imageUrl: string;
-};
-
-interface IAssets {
-  Data: object;
-}
-
-export type IPrimaryAsset = {
-  amount: number;
-  asset: IAssetMapped;
-};
-
-export type ISecondaryAsset = {
-  amount: number;
-  asset: IAssetMapped;
-};
-
-export interface IState {
-  assets: IAssets;
-  assetSearch: string;
-  primaryAsset: IPrimaryAsset;
-  secondaryAsset: ISecondaryAsset;
-  loading: boolean;
-  error: object;
-}
-
 const initialState: IState = {
   assets: {
     Data: {},
@@ -214,15 +140,6 @@ const initialState: IState = {
   loading: false,
   error: {},
 };
-
-type Action = IAssetsFetched
-  | IAssetSearch
-  | ILoadingUpdate
-  | ILoadingAssetsError
-  | IUpdatePrimarySelectedAsset
-  | IUpdatePrimaryAssetAmount
-  | IUpdateSecondaryAssetAmount
-  | IUpdateSecondarySelectedAsset;
 
 export const app: Reducer<IState> = (state: IState = initialState, action: Action): IState => {
   switch (action.type) {
@@ -290,14 +207,10 @@ export const app: Reducer<IState> = (state: IState = initialState, action: Actio
 // ----------------------------        Selectors      ------------------------------------------
 // ---------------------------------------------------------------------------------------------
 
-interface IAssets {
-  Data: object;
-}
-
-const getAssets = (assets: any): IAssetMapped[] => {
+const getAssets = (assets: any): IAsset[] => {
   const allAssetsData = assets.Data;
   const assetsCode = Object.keys(allAssetsData);
-  const assetsMaped: IAssetMapped[] = [];
+  const assetsMaped: IAsset[] = [];
 
   assetsCode.map((asset: string) => {
     assetsMaped.push({
@@ -309,15 +222,6 @@ const getAssets = (assets: any): IAssetMapped[] => {
 
   return assetsMaped;
 };
-
-export interface IMapStateToProps {
-  assets: IAssetMapped[];
-  assetSearch: string;
-  primaryAsset: IPrimaryAsset;
-  secondaryAsset: ISecondaryAsset;
-  loading: boolean;
-  error: object;
-}
 
 export const sortByName = (a: string, b: string, direction: boolean): number => {
   const nameA = a.toUpperCase(); // ignore upper and lowercase
@@ -334,7 +238,7 @@ export const sortByName = (a: string, b: string, direction: boolean): number => 
 };
 
 export const mapStateToProps = (state: MainState): IMapStateToProps => {
-  const assets = getAssets(state.app.assets).filter((asset: IAssetMapped) => {
+  const assets = getAssets(state.app.assets).filter((asset: IAsset) => {
 
     if (state.app.assetSearch === '') {
       return asset;

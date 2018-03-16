@@ -1,14 +1,14 @@
 import * as React from 'react';
 import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
-import { IPrimaryAsset, ISecondaryAsset } from '../../../data/modules/app';
+import { IPrimaryAsset, ISecondaryAsset } from '../../../data/modules/typeDefinition';
 import CircularProgress from 'material-ui/CircularProgress';
 
 interface IProps {
   primaryAsset: IPrimaryAsset;
   secondaryAsset: ISecondaryAsset;
   isConvertAssetEnabled: boolean;
-  fetchAssetsPrices(): () => any;
+  fetchAssetsPrices(): () => Promise<void>;
 }
 
 class Result extends React.Component<IProps, {open: boolean}> {

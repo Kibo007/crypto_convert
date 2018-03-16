@@ -1,16 +1,8 @@
 import * as React from 'react';
 import { connect } from 'react-redux';
-import {
-  mapStateToProps,
-  mapActionToDispatch,
-  IMapStateToProps,
-  IAssetMapped,
-  IUpdatePrimarySelectedAsset,
-  IUpdateSecondarySelectedAsset,
-  IAssetSearch,
-  IUpdatePrimaryAssetAmount,
-  IAssetsFetched,
-} from '../../data/modules/app';
+import { mapStateToProps, mapActionToDispatch } from '../../data/modules/app';
+import { IMapDispatchToProps, IMapStateToProps } from '../../data/modules/typeDefinition';
+
 import './app.scss';
 import './../styles/layout.scss';
 
@@ -22,14 +14,7 @@ import Divider from 'material-ui/Divider';
 import { List } from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 
-interface IProps extends IMapStateToProps {
-  fetchAssets(): () => IAssetsFetched;
-  updatePrimarySelectedAsset(asset: IAssetMapped): () => IUpdatePrimarySelectedAsset;
-  updatePrimaryAssetAmount(value: string): () => IUpdatePrimaryAssetAmount;
-  updateSecondarySelectedAsset(asset: IAssetMapped): () => IUpdateSecondarySelectedAsset;
-  updateAssetSearch(value: string): () => IAssetSearch;
-  fetchAssetsPrices(): () => any;
-}
+interface IProps extends IMapStateToProps, IMapDispatchToProps {}
 
 class App extends React.Component<IProps, {}> {
 

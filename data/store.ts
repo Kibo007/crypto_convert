@@ -4,7 +4,8 @@ import reduxThunk from 'redux-thunk';
 import createBrowserHistory from 'history/createBrowserHistory';
 import reduxPromise from 'redux-promise';
 
-import { IState as AppState, app } from './modules/app';
+import { app } from './modules/app';
+import { IState as AppState } from './modules/typeDefinition';
 
 export interface MainState {
   app: AppState;

@@ -2,23 +2,22 @@ import * as React from 'react';
 import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
-import { IPrimaryAsset } from '../../../data/modules/app';
-// import styles from './assets-search.scss';
+import {
+  IPrimaryAsset,
+  IAsset,
+  IUpdateSecondarySelectedAsset,
+  IUpdatePrimarySelectedAsset,
+  IAssetSearch,
+} from '../../../data/modules/typeDefinition';
 const styles = require('./assets-search.scss');
-
-type Asset = {
-  symbol: string;
-  imageUrl: string;
-  coinName: string;
-};
 
 interface IProps {
   primaryAsset?: IPrimaryAsset;
-  assets: Asset[];
-  selectedAsset: Asset;
+  assets: IAsset[];
+  selectedAsset: IAsset;
   assetSearch: string;
-  updateSelectedAsset(asset: Asset): () => any;
-  updateAssetSearch(value: string): () => any;
+  updateSelectedAsset(asset: IAsset): () => IUpdateSecondarySelectedAsset | IUpdatePrimarySelectedAsset;
+  updateAssetSearch(value: string): () => IAssetSearch;
 }
 
 class AssetSelect extends React.Component<IProps, {open: boolean}> {
@@ -34,7 +33,7 @@ class AssetSelect extends React.Component<IProps, {open: boolean}> {
     this.setState({ open: false });
   }
 
-  private updateAsset = (asset: Asset) => {
+  private updateAsset = (asset: IAsset) => {
     this.props.updateSelectedAsset(asset);
     this.handleClose();
   }
@@ -78,7 +77,7 @@ class AssetSelect extends React.Component<IProps, {open: boolean}> {
           autoScrollBodyContent={true}
         >
           <ul>
-            {this.props.assets.map((asset: Asset, i: number) => {
+            {this.props.assets.map((asset: IAsset, i: number) => {
               return (
                 <li key={i}
                     onClick={() => this.updateAsset(asset)}
