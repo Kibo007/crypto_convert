@@ -23,10 +23,6 @@
         ],
         "react",
         "stage-1"
-      ],
-      "plugins": [
-        "transform-react-constant-elements",
-        "transform-react-remove-prop-types"
       ]
     },
     "test": {
