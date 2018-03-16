@@ -2,7 +2,7 @@ import * as React from 'react';
 import AppBar from 'material-ui/AppBar';
 
 interface NavigationBarProps {
-  title: string,
+  title: string;
 }
 
 const NavigationBar: React.SFC<NavigationBarProps> = props => (

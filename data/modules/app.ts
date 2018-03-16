@@ -134,7 +134,7 @@ export function fetchAssets(): (dispatch: Dispatch<IState>) => Promise<void> {
   };
 }
 
-export function fetchAssetsPrices(): (dispatch: Dispatch<IState>, getState: () => MainState) =>  Promise<void> {
+export function fetchAssetsPrices(): (dispatch: Dispatch<IState>, getState: () => MainState) => Promise<void> {
   return async (dispatch: Dispatch<IState>, getState: () => MainState) => {
 
     const state: MainState = getState();
@@ -145,8 +145,8 @@ export function fetchAssetsPrices(): (dispatch: Dispatch<IState>, getState: () =
     const secondaryAssetURL = `https://min-api.cryptocompare.com/data/price?fsym=${secondaryAssetSymbol}&tsyms=BTC`;
 
     try {
-      const primaryAssetPrice: {BTC: number} = await getAPI(primaryAssetURL);
-      const secondaryAssetPrice: {BTC: number} = await getAPI(secondaryAssetURL);
+      const primaryAssetPrice: { BTC: number } = await getAPI(primaryAssetURL);
+      const secondaryAssetPrice: { BTC: number } = await getAPI(secondaryAssetURL);
 
       const secondaryAssetAmount: number = (primaryAssetAmount * primaryAssetPrice.BTC) / secondaryAssetPrice.BTC;
 
@@ -322,10 +322,10 @@ export interface IMapStateToProps {
 export const sortByName = (a: string, b: string, direction: boolean): number => {
   const nameA = a.toUpperCase(); // ignore upper and lowercase
   const nameB = b.toUpperCase(); // ignore upper and lowercase
-  if ( nameA < nameB ) {
+  if (nameA < nameB) {
     return direction ? -1 : 1;
   }
-  if ( nameA > nameB ) {
+  if (nameA > nameB) {
     return direction ? 1 : -1;
   }
 
@@ -336,7 +336,7 @@ export const sortByName = (a: string, b: string, direction: boolean): number => 
 export const mapStateToProps = (state: MainState): IMapStateToProps => {
   const assets = getAssets(state.app.assets).filter((asset: IAssetMapped) => {
 
-    if ( state.app.assetSearch === '' ) {
+    if (state.app.assetSearch === '') {
       return asset;
     }
 
