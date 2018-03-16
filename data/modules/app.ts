@@ -179,6 +179,7 @@ export const app: Reducer<IState> = (state: IState = initialState, action: Actio
           ...state.primaryAsset,
           asset: action.payload,
         },
+        assetSearch: '',
       };
     case ActionTypes.UPDATE_SECONDARY_SELECTED_ASSET:
       return {
@@ -187,6 +188,7 @@ export const app: Reducer<IState> = (state: IState = initialState, action: Actio
           ...state.secondaryAsset,
           asset: action.payload,
         },
+        assetSearch: '',
       };
     case ActionTypes.UPDATE_PRIMARY_ASSET_AMOUNT:
       return {
