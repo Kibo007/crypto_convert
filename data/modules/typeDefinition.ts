@@ -127,13 +127,11 @@ export interface IMapStateToProps {
   error: ErrorMessage;
 }
 
-
-
 export interface IMapDispatchToProps {
   fetchAssets(): () => IAssetsFetched;
   updatePrimarySelectedAsset(asset: IAsset): () => IUpdatePrimarySelectedAsset;
   updatePrimaryAssetAmount(value: string): () => IUpdatePrimaryAssetAmount;
   updateSecondarySelectedAsset(asset: IAsset): () => IUpdateSecondarySelectedAsset;
   updateAssetSearch(value: string): () => IAssetSearch;
-  fetchAssetsPrices(): () => any;
+  fetchAssetsPrices(): () => Promise<void>;
 }
