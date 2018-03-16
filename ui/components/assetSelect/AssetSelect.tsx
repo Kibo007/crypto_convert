@@ -16,8 +16,8 @@ interface IProps {
   assets: IAsset[];
   selectedAsset: IAsset;
   assetSearch: string;
-  updateSelectedAsset(asset: IAsset): () => IUpdateSecondarySelectedAsset | IUpdatePrimarySelectedAsset;
-  updateAssetSearch(value: string): () => IAssetSearch;
+  updateSelectedAsset(asset: IAsset): IUpdateSecondarySelectedAsset | IUpdatePrimarySelectedAsset;
+  updateAssetSearch(value: string): IAssetSearch;
 }
 
 class AssetSelect extends React.Component<IProps, {open: boolean}> {

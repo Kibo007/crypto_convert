@@ -128,10 +128,10 @@ export interface IMapStateToProps {
 }
 
 export interface IMapDispatchToProps {
-  fetchAssets(): () => IAssetsFetched;
-  updatePrimarySelectedAsset(asset: IAsset): () => IUpdatePrimarySelectedAsset;
-  updatePrimaryAssetAmount(value: string): () => IUpdatePrimaryAssetAmount;
-  updateSecondarySelectedAsset(asset: IAsset): () => IUpdateSecondarySelectedAsset;
-  updateAssetSearch(value: string): () => IAssetSearch;
+  fetchAssets(): () => Promise<void>;
+  updatePrimarySelectedAsset(asset: IAsset): IUpdatePrimarySelectedAsset;
+  updatePrimaryAssetAmount(value: string): IUpdatePrimaryAssetAmount;
+  updateSecondarySelectedAsset(asset: IAsset): IUpdateSecondarySelectedAsset;
+  updateAssetSearch(value: string): IAssetSearch;
   fetchAssetsPrices(): () => Promise<void>;
 }
