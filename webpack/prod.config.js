@@ -3,11 +3,10 @@ const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const merge = require('webpack-merge');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const baseConfig = require('./base.config.js');
 
-const BUILD_DIR = path.resolve(__dirname, '../../dist');
+const BUILD_DIR = path.resolve(__dirname, '../dist');
 
 module.exports = merge(baseConfig, {
     output: {
@@ -16,10 +15,6 @@ module.exports = merge(baseConfig, {
     },
 
     plugins: [
-        // Copy assets from public folder to dist
-        new CopyWebpackPlugin([
-            {from: 'public/', to: ''}
-        ]),
         new webpack.DefinePlugin({'process.env.NODE_ENV': JSON.stringify('production')}),
         // Extract imported CSS into own file
         new ExtractTextPlugin('[name].bundle.[chunkhash].css'),
