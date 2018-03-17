@@ -1,3 +1,5 @@
+/// <reference path="../../../types/react-virtual-list/react-virtual-list.d.ts" />
+
 import * as React from 'react';
 import Dialog from 'material-ui/Dialog';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -10,7 +12,7 @@ import {
   IAssetSearch,
 } from '../../../data/modules/typeDefinition';
 const styles = require('./assets-search.scss');
-
+import VirtualList from 'react-virtual-list';
 interface IProps {
   primaryAsset?: IPrimaryAsset;
   assets: IAsset[];
@@ -18,6 +20,16 @@ interface IProps {
   assetSearch: string;
   updateSelectedAsset(asset: IAsset): IUpdateSecondarySelectedAsset | IUpdatePrimarySelectedAsset;
   updateAssetSearch(value: string): IAssetSearch;
+}
+
+interface IVirtual {
+  style: object;
+  items: IAsset[];
+}
+
+interface IMylist {
+  virtual: IVirtual;
+  itemHeight: number;
 }
 
 class AssetSelect extends React.Component<IProps, {open: boolean}> {
@@ -40,6 +52,24 @@ class AssetSelect extends React.Component<IProps, {open: boolean}> {
 
   public render() {
     const hasSelectedAsset = this.props.selectedAsset.symbol.length > 0;
+
+    const MyList = ({ virtual, itemHeight }: IMylist) => (
+      <ul style={virtual.style}>
+        {virtual.items.map((asset: IAsset, i: number)  => (
+          <li key={i}
+              onClick={() => this.updateAsset(asset)}
+              data-layout="row" data-layout-align="space-between center"
+              className={styles.asset}
+              style={{ height: itemHeight }}
+          >
+            <img className={styles.image} src={asset.imageUrl} alt={asset.coinName}/>
+            <span>{asset.symbol}</span>
+            <span>{asset.coinName}</span>
+          </li>
+        ))}
+      </ul>
+    );
+    const MyVirtualList = VirtualList()(MyList);
     return (
       <div>
         { hasSelectedAsset ?
@@ -74,23 +104,13 @@ class AssetSelect extends React.Component<IProps, {open: boolean}> {
           modal={false}
           open={this.state.open}
           onRequestClose={this.handleClose}
-          autoScrollBodyContent={true}
         >
-          <ul>
-            {this.props.assets.map((asset: IAsset, i: number) => {
-              return (
-                <li key={i}
-                    onClick={() => this.updateAsset(asset)}
-                    data-layout="row" data-layout-align="space-between center"
-                    className={styles.asset}
-                >
-                  <img className={styles.image} src={asset.imageUrl} alt={asset.coinName}/>
-                  <span>{asset.symbol}</span>
-                  <span>{asset.coinName}</span>
-                </li>
-              );
-            })}
-          </ul>
+
+          <MyVirtualList
+            items={this.props.assets}
+            itemHeight={100}
+          />
+
         </Dialog>
       </div>
     );
