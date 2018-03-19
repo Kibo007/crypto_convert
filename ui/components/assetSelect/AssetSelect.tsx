@@ -10,6 +10,7 @@ import {
   IAssetSearch,
 } from '../../../data/modules/typeDefinition';
 const styles = require('./assets-search.scss');
+import VirtualList from 'react-tiny-virtual-list';
 
 interface IProps {
   primaryAsset?: IPrimaryAsset;
@@ -76,20 +77,29 @@ class AssetSelect extends React.Component<IProps, {open: boolean}> {
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}
         >
+
+
           <ul>
-            {this.props.assets.map((asset: IAsset, i: number) => {
-              return (
-                <li key={i}
-                    onClick={() => this.updateAsset(asset)}
+            <VirtualList
+              width="100%"
+              height={600}
+              itemCount={this.props.assets.length}
+              itemSize={50} // Also supports variable heights (array or function getter)
+              renderItem={({ index }) =>
+                <li key={index}
+                    onClick={() => this.updateAsset(this.props.assets[index])}
                     data-layout="row" data-layout-align="space-between center"
                     className={styles.asset}
                 >
-                  <img className={styles.image} src={asset.imageUrl} alt={asset.coinName}/>
-                  <span>{asset.symbol}</span>
-                  <span>{asset.coinName}</span>
+                  <img className={styles.image}
+                       src={this.props.assets[index].imageUrl}
+                       alt={this.props.assets[index].coinName}
+                  />
+                  <span>{this.props.assets[index].symbol}</span>
+                  <span>{this.props.assets[index].coinName}</span>
                 </li>
-              );
-            })}
+              }
+            />
           </ul>
         </Dialog>
       </div>

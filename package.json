@@ -10,6 +10,7 @@
   ],
   "dependencies": {
     "@types/material-ui": "^0.21.1",
+    "@types/prop-types": "^15.5.2",
     "@types/react": "^16.0.40",
     "@types/react-dom": "^16.0.4",
     "@types/react-redux": "^5.0.15",
@@ -34,6 +35,7 @@
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
     "react-router-redux": "next",
+    "react-tiny-virtual-list": "^2.1.4",
     "redux": "^3.7.2",
     "redux-promise": "^0.5.3",
     "redux-thunk": "^2.2.0",
