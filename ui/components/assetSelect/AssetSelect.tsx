@@ -9,7 +9,9 @@ import {
   IUpdatePrimarySelectedAsset,
   IAssetSearch,
 } from '../../../data/modules/typeDefinition';
+
 const styles = require('./assets-search.scss');
+import { List } from 'react-virtualized';
 
 interface IProps {
   primaryAsset?: IPrimaryAsset;
@@ -20,8 +22,8 @@ interface IProps {
   updateAssetSearch(value: string): IAssetSearch;
 }
 
-class AssetSelect extends React.Component<IProps, {open: boolean}> {
-  readonly state  = {
+class AssetSelect extends React.Component<IProps, { open: boolean }> {
+  readonly state = {
     open: false,
   };
 
@@ -38,11 +40,27 @@ class AssetSelect extends React.Component<IProps, {open: boolean}> {
     this.handleClose();
   }
 
+  private rowRenderer = ({ key, index }: {key: any, index: any}) => {
+    return (
+      <li key={key}
+          onClick={() => this.updateAsset(this.props.assets[index])}
+          data-layout="row" data-layout-align="space-between center"
+          className={styles.asset}
+      >
+        <img className={styles.image} src={this.props.assets[index].imageUrl} alt={this.props.assets[index].coinName}/>
+        <span>{this.props.assets[index].symbol}</span>
+        <span>{this.props.assets[index].coinName}</span>
+      </li>
+    );
+  }
+
   public render() {
     const hasSelectedAsset = this.props.selectedAsset.symbol.length > 0;
+
+
     return (
       <div>
-        { hasSelectedAsset ?
+        {hasSelectedAsset ?
           <div
             onClick={this.handleOpen}
             className={styles.selectedAsset}
@@ -56,7 +74,7 @@ class AssetSelect extends React.Component<IProps, {open: boolean}> {
             <span>{this.props.selectedAsset.symbol}</span>
             <span>{this.props.selectedAsset.coinName}</span>
           </div> :
-          <RaisedButton label="select asset" onClick={this.handleOpen} />
+          <RaisedButton label="select asset" onClick={this.handleOpen}/>
         }
 
         <Dialog
@@ -76,25 +94,20 @@ class AssetSelect extends React.Component<IProps, {open: boolean}> {
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}
         >
-          <ul>
-            {this.props.assets.map((asset: IAsset, i: number) => {
-              return (
-                <li key={i}
-                    onClick={() => this.updateAsset(asset)}
-                    data-layout="row" data-layout-align="space-between center"
-                    className={styles.asset}
-                >
-                  <img className={styles.image} src={asset.imageUrl} alt={asset.coinName}/>
-                  <span>{asset.symbol}</span>
-                  <span>{asset.coinName}</span>
-                </li>
-              );
-            })}
-          </ul>
+          <List
+            height={500}
+            width={300}
+            rowCount={this.props.assets.length}
+            rowHeight={50}
+            rowRenderer={this.rowRenderer}
+          />
+
         </Dialog>
       </div>
     );
   }
 }
 
+// Wrap your component with the HOC.
 export default AssetSelect;
+

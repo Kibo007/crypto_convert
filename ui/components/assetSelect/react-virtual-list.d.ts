@@ -1,1 +1,1 @@
-declare module 'react-virtual-list';
+declare module 'react-sizeme';
