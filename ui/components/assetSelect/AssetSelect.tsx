@@ -81,25 +81,24 @@ class AssetSelect extends React.Component<IProps, { open: boolean }> {
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}
         >
-          <ul>
             <Infinite elementHeight={50}
                       containerHeight={500}
             >
               {this.props.assets.map((asset: IAsset, i: number) => {
                 return (
-                  <li key={i}
+                  <div key={i}
                       onClick={() => this.updateAsset(asset)}
                       data-layout="row" data-layout-align="space-between center"
-                      className={styles.asset}
+                      className={this.props.assets.length === 1 ? styles.asset : styles.assets}
                   >
                     <img className={styles.image} src={asset.imageUrl} alt={asset.coinName}/>
                     <span>{asset.symbol}</span>
                     <span>{asset.coinName}</span>
-                  </li>
+                  </div>
                 );
               })}
             </Infinite>
-          </ul>
+
         </Dialog>
       </div>
     );
