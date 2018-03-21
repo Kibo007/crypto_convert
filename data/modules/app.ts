@@ -17,47 +17,48 @@ import {
   IMapStateToProps,
   ErrorMessage,
 } from './typeDefinition';
+import api from '../helpers/api';
 
 // ---------------------------------------------------------------------------------------------
 // ---------------------------- Action creator  ------------------------------------------------
 // ---------------------------------------------------------------------------------------------
 
-const assetsFetched = (assets: object): IAssetsFetched => ({
+export const assetsFetched = (assets: object): IAssetsFetched => ({
   type: ActionTypes.ALL_ASSETS_FETCHED,
   payload: assets,
 });
 
-const updatePrimaryAssetAmount = (amount: string): IUpdatePrimaryAssetAmount => ({
+export const updatePrimaryAssetAmount = (amount: string): IUpdatePrimaryAssetAmount => ({
   type: ActionTypes.UPDATE_PRIMARY_ASSET_AMOUNT,
   payload: parseInt(amount, 10),
 });
 
-const updateSecondaryAssetAmount = (amount: number): IUpdateSecondaryAssetAmount => ({
+export const updateSecondaryAssetAmount = (amount: number): IUpdateSecondaryAssetAmount => ({
   type: ActionTypes.UPDATE_SECONDARY_ASSET_AMOUNT,
   payload: amount,
 });
 
-const updatePrimarySelectedAsset = (asset: IAsset): IUpdatePrimarySelectedAsset => ({
+export const updatePrimarySelectedAsset = (asset: IAsset): IUpdatePrimarySelectedAsset => ({
   type: ActionTypes.UPDATE_PRIMARY_SELECTED_ASSET,
   payload: asset,
 });
 
-const updateSecondarySelectedAsset = (asset: IAsset): IUpdateSecondarySelectedAsset => ({
+export const updateSecondarySelectedAsset = (asset: IAsset): IUpdateSecondarySelectedAsset => ({
   type: ActionTypes.UPDATE_SECONDARY_SELECTED_ASSET,
   payload: asset,
 });
 
-const loading = (isLoading: boolean): ILoadingUpdate => ({
+export const loading = (isLoading: boolean): ILoadingUpdate => ({
   type: ActionTypes.LOADING,
   payload: isLoading,
 });
 
-const handleError = (error: ErrorMessage): ILoadingAssetsError => ({
+export const handleError = (error: ErrorMessage): ILoadingAssetsError => ({
   type: ActionTypes.ERROR_LOADING_ASSETS,
   payload: error,
 });
 
-const updateAssetSearch = (search: string): IAssetSearch => ({
+export const updateAssetSearch = (search: string): IAssetSearch => ({
   type: ActionTypes.UPDATE_ASSET_SEARCH,
   payload: search,
 });
@@ -66,23 +67,12 @@ const updateAssetSearch = (search: string): IAssetSearch => ({
 // ---------------------------- Async action creator  ------------------------------------------
 // ---------------------------------------------------------------------------------------------
 
-export async function getAPI(requestUrl: string): Promise<any> {
-  const response = await fetch(requestUrl);
-
-  if (response.ok) {
-    return await response.json();
-  } else {
-    throw new Error();
-  }
-}
-
-export function fetchAssets(): (dispatch: Dispatch<IState>) => Promise<void> {
+export function fetchAssets(): (dispatch: Dispatch<IState>) => Promise<any> {
   return async (dispatch: Dispatch<IState>) => {
     dispatch(loading(true));
 
     try {
-      const response = await getAPI(`https://min-api.cryptocompare.com/data/all/coinlist`);
-
+      const response = await api.get(`https://min-api.cryptocompare.com/data/all/coinlist`);
       dispatch(assetsFetched(response));
     } catch (err) {
       dispatch(handleError(err));
@@ -104,8 +94,8 @@ export function fetchAssetsPrices(): (dispatch: Dispatch<IState>, getState: () =
     type APIResponse = { BTC?: number; Response?: string; Message?: string; };
 
     try {
-      const primaryAssetPrice: APIResponse = await getAPI(primaryAssetURL);
-      const secondaryAssetPrice: APIResponse = await getAPI(secondaryAssetURL);
+      const primaryAssetPrice: APIResponse = await api.get(primaryAssetURL);
+      const secondaryAssetPrice: APIResponse = await api.get(secondaryAssetURL);
       dispatch(loading(false));
 
       if (primaryAssetPrice.Response === 'Error') {
@@ -127,7 +117,7 @@ export function fetchAssetsPrices(): (dispatch: Dispatch<IState>, getState: () =
 // ----------------------------         Reducer       ------------------------------------------
 // ---------------------------------------------------------------------------------------------\
 
-const initialState: IState = {
+export const initialState: IState = {
   assets: {
     Data: {},
   },
