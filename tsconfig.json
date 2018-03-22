@@ -11,10 +11,14 @@
     "lib": ["es2017", "dom"],
     "noEmitOnError": false,
     "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedParameters": true
   },
   "include": [
     "./data/**/*",
     "./ui/**/*"
+  ],
+  "exclude": [
+    "./data/**/__tests__/*",
+    "./data/**/__mocks__/*"
   ]
 }

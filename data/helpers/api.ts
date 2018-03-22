@@ -10,7 +10,6 @@ async function getAPI(requestUrl: string): Promise<null> {
 
 type Api = {
   get(requestUrl: string): Promise<null>,
-  setMockResponse?(data: any): void;
 };
 
 const api: Api = {
