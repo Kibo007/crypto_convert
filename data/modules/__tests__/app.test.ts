@@ -19,7 +19,7 @@ import {
   mapStateToProps,
 } from '../app';
 import {
-  ActionTypes, ErrorMessage, IAsset,
+  ActionTypes, ErrorMessage, IAsset, IPrimaryAsset, ISecondaryAsset,
 } from '../typeDefinition';
 
 import configureMockStore from 'redux-mock-store';
@@ -309,5 +309,56 @@ describe('App module', () => {
   // ///////////////////////////////////////////////////////////////////////////////////////////////////////
   // ////////////////////////                         App Selector                      /////////////////////
   // ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  describe('article module - selectors', () => {
+    it('should select and return peace of state for article detail page', () => {
+      // create state of app
 
+      const primaryAsset = {
+        amount: 1,
+        asset: {
+          symbol: 'ETN',
+          coinName: 'Electroneum',
+          imageUrl: 'some/url',
+        },
+      };
+      const secondaryAsset = {
+        amount: 10,
+        asset: {
+          symbol: 'CAPP',
+          coinName: 'Cappacity',
+          imageUrl: 'some/url',
+        },
+      };
+      const state = {
+        app: {
+          assets,
+          primaryAsset,
+          secondaryAsset,
+          assetSearch: '',
+          loading: false,
+          error: { message: '' },
+        },
+        router: {},
+      };
+
+      const mappedExpectedAssets = [
+        { coinName: 'Cardano', imageUrl: 'https://www.cryptocompare.com/media/12318177/ada.png', symbol: 'ADA' },
+        {
+          coinName: 'CoinPlace Token',
+          imageUrl: 'https://www.cryptocompare.com/media/30001726/cpl.png',
+          symbol: 'CPL',
+        },
+        { coinName: 'EOS', imageUrl: 'https://www.cryptocompare.com/media/1383652/eos_1.png', symbol: 'EOS' },
+        { coinName: 'Valorem', imageUrl: 'https://www.cryptocompare.com/media/20780606/vlr.png', symbol: 'VLR' },
+      ];
+
+      // pass state to blog article selector
+      const selectedStateOfApp = mapStateToProps(state);
+      expect(selectedStateOfApp.assets).toEqual(mappedExpectedAssets);
+      expect(selectedStateOfApp.primaryAsset).toEqual(primaryAsset);
+      expect(selectedStateOfApp.secondaryAsset).toEqual(secondaryAsset);
+      expect(selectedStateOfApp.loading).toEqual(false);
+      expect(selectedStateOfApp.error).toEqual({ message: '' });
+    });
+  });
 });
