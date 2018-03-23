@@ -12,6 +12,11 @@ import {
   initialState,
   // async action creators
   fetchAssets,
+  fetchAssetsPrices,
+  // reducer
+  app as appReducer,
+  // selectors
+  mapStateToProps,
 } from '../app';
 import {
   ActionTypes, ErrorMessage, IAsset,
@@ -135,5 +140,174 @@ describe('App module', () => {
       expect(actionsCreated).toEqual(expectedActions);
     });
 
+    it('should fetch assets prices from cryptocompare api and update secondary amount', async () => {
+      api.setMockResponse({ BTC: 0.001 });
+
+      const expectedActions = [
+        { type: ActionTypes.LOADING, payload: true },
+        { type: ActionTypes.LOADING, payload: false },
+        { type: ActionTypes.UPDATE_SECONDARY_ASSET_AMOUNT, payload: 1 },
+      ];
+
+      const stateWithAssets = {
+        app: {
+          primaryAsset: {
+            amount: 1,
+            asset: {
+              symbol: 'ETN',
+            },
+          },
+          secondaryAsset: {
+            asset: {
+              symbol: 'CAPP',
+            },
+          },
+        },
+      };
+
+      const store = mockStore(stateWithAssets);
+      await store.dispatch(fetchAssetsPrices());
+
+      const actionsCreated = store.getActions();
+      expect(actionsCreated).toEqual(expectedActions);
+    });
+
+    it('should fetch assets prices from cryptocompare api and update secondary amount', async () => {
+      api.setMockResponse({ Response: 'Error', Message: 'This asset price is not available' });
+
+      const expectedActions = [
+        { type: ActionTypes.LOADING, payload: true },
+        { type: ActionTypes.LOADING, payload: false },
+        { type: ActionTypes.ERROR_LOADING_ASSETS, payload: { message: 'This asset price is not available' } },
+      ];
+
+      const stateWithAssets = {
+        app: {
+          primaryAsset: {
+            amount: 1,
+            asset: {
+              symbol: 'XXX',
+            },
+          },
+          secondaryAsset: {
+            asset: {
+              symbol: 'CAPP',
+            },
+          },
+        },
+      };
+
+      const store = mockStore(stateWithAssets);
+      await store.dispatch(fetchAssetsPrices());
+
+      const actionsCreated = store.getActions();
+      expect(actionsCreated).toEqual(expectedActions);
+    });
+
   });
+
+  // ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  // ////////////////////////                         App Reducer                      /////////////////////
+  // ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  describe('app module - reducer', () => {
+    const asset = {
+      symbol: 'ETN',
+      imageUrl: 'url/to/image.png',
+      coinName: 'Electroneum',
+    }
+    it('should return initial state', () => {
+      expect(appReducer(initialState, { type: 'unknown' })).toEqual(initialState);
+    });
+
+    it('should handle ALL_ASSETS_FETCHED', () => {
+      const expectedState = {
+        ...initialState,
+        assets,
+      };
+      const updateState = appReducer(initialState, assetsFetched(assets));
+      expect(updateState).toEqual(expectedState);
+    });
+
+    it('should handle UPDATE_PRIMARY_ASSET_AMOUNT', () => {
+      const expectedState = {
+        ...initialState,
+        primaryAsset: {
+          ...initialState.primaryAsset,
+          amount: 100,
+        },
+      };
+      const updateState = appReducer(initialState, updatePrimaryAssetAmount('100'));
+      expect(updateState).toEqual(expectedState);
+    });
+
+    it('should handle UPDATE_SECONDARY_ASSET_AMOUNT', () => {
+      const expectedState = {
+        ...initialState,
+        secondaryAsset: {
+          ...initialState.secondaryAsset,
+          amount: 100,
+        },
+      };
+      const updateState = appReducer(initialState, updateSecondaryAssetAmount(100));
+      expect(updateState).toEqual(expectedState);
+    });
+
+    it('should handle UPDATE_PRIMARY_SELECTED_ASSET', () => {
+      const expectedState = {
+        ...initialState,
+        primaryAsset: {
+          ...initialState.primaryAsset,
+          asset,
+        },
+      };
+      const updateState = appReducer(initialState, updatePrimarySelectedAsset(asset));
+      expect(updateState).toEqual(expectedState);
+    });
+
+    it('should handle UPDATE_SECONDARY_SELECTED_ASSET', () => {
+      const expectedState = {
+        ...initialState,
+        secondaryAsset: {
+          ...initialState.secondaryAsset,
+          asset,
+        },
+      };
+      const updateState = appReducer(initialState, updateSecondarySelectedAsset(asset));
+      expect(updateState).toEqual(expectedState);
+    });
+
+    it('should handle LOADING', () => {
+      const expectedState = {
+        ...initialState,
+        loading: true,
+      };
+      const updateState = appReducer(initialState, loading(true));
+      expect(updateState).toEqual(expectedState);
+    });
+
+    it('should handle ERROR_LOADING_ASSETS', () => {
+      const expectedState = {
+        ...initialState,
+        error: {
+          message: 'something  went wrong',
+        },
+      };
+      const updateState = appReducer(initialState, handleError({ message: 'something  went wrong' }));
+      expect(updateState).toEqual(expectedState);
+    });
+
+    it('should handle UPDATE_ASSET_SEARCH', () => {
+      const expectedState = {
+        ...initialState,
+        assetSearch: 'ETN',
+      };
+      const updateState = appReducer(initialState, updateAssetSearch('ETN'));
+      expect(updateState).toEqual(expectedState);
+    });
+  });
+
+  // ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  // ////////////////////////                         App Selector                      /////////////////////
+  // ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
 });
